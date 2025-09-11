@@ -1536,3 +1536,1601 @@ Stacktrace:
 
 2025-09-11 23:40:58,959 - AutoBooking - INFO - 浏览器已关闭
 2025-09-11 23:40:58,959 - AutoBooking - INFO - 浏览器已关闭
+2025-09-12 00:05:16,485 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:05:16,485 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:05:16,754 - AutoBooking - INFO - Chrome版本: Google Chrome 140.0.7339.127
+2025-09-12 00:05:16,754 - AutoBooking - INFO - Chrome版本: Google Chrome 140.0.7339.127
+2025-09-12 00:05:19,441 - AutoBooking - INFO - 浏览器驱动初始化成功
+2025-09-12 00:05:19,441 - AutoBooking - INFO - 浏览器驱动初始化成功
+2025-09-12 00:05:22,792 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:05:22,792 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:05:55,625 - AutoBooking - INFO - 开始自动预订: D3
+2025-09-12 00:05:55,625 - AutoBooking - INFO - 开始自动预订: D3
+2025-09-12 00:05:55,626 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:05:55,626 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:05:58,719 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:05:58,719 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:05:58,720 - AutoBooking - INFO - 开始搜索车票...
+2025-09-12 00:05:58,720 - AutoBooking - INFO - 开始搜索车票...
+2025-09-12 00:05:58,743 - AutoBooking - WARNING - 第 1 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:05:58,743 - AutoBooking - WARNING - 第 1 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:06:00,803 - AutoBooking - WARNING - 第 2 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:06:00,803 - AutoBooking - WARNING - 第 2 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:06:02,866 - AutoBooking - WARNING - 第 3 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:06:02,866 - AutoBooking - WARNING - 第 3 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:06:02,868 - AutoBooking - ERROR - 搜索车票失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:06:02,868 - AutoBooking - ERROR - 搜索车票失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:06:22,596 - AutoBooking - INFO - 开始自动预订: D3
+2025-09-12 00:06:22,596 - AutoBooking - INFO - 开始自动预订: D3
+2025-09-12 00:06:22,597 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:06:22,597 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:06:25,472 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:06:25,472 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:06:25,473 - AutoBooking - INFO - 开始搜索车票...
+2025-09-12 00:06:25,473 - AutoBooking - INFO - 开始搜索车票...
+2025-09-12 00:06:25,508 - AutoBooking - WARNING - 第 1 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:06:25,508 - AutoBooking - WARNING - 第 1 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:06:27,537 - AutoBooking - WARNING - 第 2 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:06:27,537 - AutoBooking - WARNING - 第 2 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:06:29,592 - AutoBooking - WARNING - 第 3 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:06:29,592 - AutoBooking - WARNING - 第 3 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:06:29,594 - AutoBooking - ERROR - 搜索车票失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:06:29,594 - AutoBooking - ERROR - 搜索车票失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:07:11,179 - AutoBooking - INFO - 开始自动预订: D3
+2025-09-12 00:07:11,179 - AutoBooking - INFO - 开始自动预订: D3
+2025-09-12 00:07:11,179 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:07:11,179 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:07:14,207 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:07:14,207 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:07:14,208 - AutoBooking - INFO - 开始搜索车票...
+2025-09-12 00:07:14,208 - AutoBooking - INFO - 开始搜索车票...
+2025-09-12 00:07:14,223 - AutoBooking - WARNING - 第 1 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:07:14,223 - AutoBooking - WARNING - 第 1 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:07:16,284 - AutoBooking - WARNING - 第 2 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:07:16,284 - AutoBooking - WARNING - 第 2 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:07:15,798 - AutoBooking - WARNING - 第 3 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:07:15,798 - AutoBooking - WARNING - 第 3 次搜索失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:07:15,798 - AutoBooking - ERROR - 搜索车票失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:07:15,798 - AutoBooking - ERROR - 搜索车票失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[@id="query_ticket"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x641e2d4fb94a <unknown>
+#1 0x641e2cf708a0 <unknown>
+#2 0x641e2cfc2540 <unknown>
+#3 0x641e2cfc2731 <unknown>
+#4 0x641e2d010824 <unknown>
+#5 0x641e2cfe805d <unknown>
+#6 0x641e2d00dc23 <unknown>
+#7 0x641e2cfe7e03 <unknown>
+#8 0x641e2cfb4968 <unknown>
+#9 0x641e2cfb55e1 <unknown>
+#10 0x641e2d4bf548 <unknown>
+#11 0x641e2d4c3272 <unknown>
+#12 0x641e2d4a6313 <unknown>
+#13 0x641e2d4c3dc5 <unknown>
+#14 0x641e2d48b49f <unknown>
+#15 0x641e2d4e8158 <unknown>
+#16 0x641e2d4e8332 <unknown>
+#17 0x641e2d4faa53 <unknown>
+#18 0x7143d869caa4 <unknown>
+#19 0x7143d8729c3c <unknown>
+
+2025-09-12 00:08:36,464 - AutoBooking - INFO - 浏览器已关闭
+2025-09-12 00:08:36,464 - AutoBooking - INFO - 浏览器已关闭
+2025-09-12 00:08:45,570 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:08:45,570 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:08:45,631 - AutoBooking - INFO - Chrome版本: Google Chrome 140.0.7339.127
+2025-09-12 00:08:45,631 - AutoBooking - INFO - Chrome版本: Google Chrome 140.0.7339.127
+2025-09-12 00:08:46,539 - AutoBooking - INFO - 浏览器驱动初始化成功
+2025-09-12 00:08:46,539 - AutoBooking - INFO - 浏览器驱动初始化成功
+2025-09-12 00:08:57,207 - AutoBooking - ERROR - 填充搜索表单失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[@id="toStationText"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x5c132814894a <unknown>
+#1 0x5c1327bbd8a0 <unknown>
+#2 0x5c1327c0f540 <unknown>
+#3 0x5c1327c0f731 <unknown>
+#4 0x5c1327c5d824 <unknown>
+#5 0x5c1327c3505d <unknown>
+#6 0x5c1327c5ac23 <unknown>
+#7 0x5c1327c34e03 <unknown>
+#8 0x5c1327c01968 <unknown>
+#9 0x5c1327c025e1 <unknown>
+#10 0x5c132810c548 <unknown>
+#11 0x5c1328110272 <unknown>
+#12 0x5c13280f3313 <unknown>
+#13 0x5c1328110dc5 <unknown>
+#14 0x5c13280d849f <unknown>
+#15 0x5c1328135158 <unknown>
+#16 0x5c1328135332 <unknown>
+#17 0x5c1328147a53 <unknown>
+#18 0x763a9ba9caa4 <unknown>
+#19 0x763a9bb29c3c <unknown>
+
+2025-09-12 00:08:57,207 - AutoBooking - ERROR - 填充搜索表单失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[@id="toStationText"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x5c132814894a <unknown>
+#1 0x5c1327bbd8a0 <unknown>
+#2 0x5c1327c0f540 <unknown>
+#3 0x5c1327c0f731 <unknown>
+#4 0x5c1327c5d824 <unknown>
+#5 0x5c1327c3505d <unknown>
+#6 0x5c1327c5ac23 <unknown>
+#7 0x5c1327c34e03 <unknown>
+#8 0x5c1327c01968 <unknown>
+#9 0x5c1327c025e1 <unknown>
+#10 0x5c132810c548 <unknown>
+#11 0x5c1328110272 <unknown>
+#12 0x5c13280f3313 <unknown>
+#13 0x5c1328110dc5 <unknown>
+#14 0x5c13280d849f <unknown>
+#15 0x5c1328135158 <unknown>
+#16 0x5c1328135332 <unknown>
+#17 0x5c1328147a53 <unknown>
+#18 0x763a9ba9caa4 <unknown>
+#19 0x763a9bb29c3c <unknown>
+
+2025-09-12 00:08:57,209 - AutoBooking - ERROR - 打开浏览器失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[@id="toStationText"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x5c132814894a <unknown>
+#1 0x5c1327bbd8a0 <unknown>
+#2 0x5c1327c0f540 <unknown>
+#3 0x5c1327c0f731 <unknown>
+#4 0x5c1327c5d824 <unknown>
+#5 0x5c1327c3505d <unknown>
+#6 0x5c1327c5ac23 <unknown>
+#7 0x5c1327c34e03 <unknown>
+#8 0x5c1327c01968 <unknown>
+#9 0x5c1327c025e1 <unknown>
+#10 0x5c132810c548 <unknown>
+#11 0x5c1328110272 <unknown>
+#12 0x5c13280f3313 <unknown>
+#13 0x5c1328110dc5 <unknown>
+#14 0x5c13280d849f <unknown>
+#15 0x5c1328135158 <unknown>
+#16 0x5c1328135332 <unknown>
+#17 0x5c1328147a53 <unknown>
+#18 0x763a9ba9caa4 <unknown>
+#19 0x763a9bb29c3c <unknown>
+
+2025-09-12 00:08:57,209 - AutoBooking - ERROR - 打开浏览器失败: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[@id="toStationText"]"}
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+#0 0x5c132814894a <unknown>
+#1 0x5c1327bbd8a0 <unknown>
+#2 0x5c1327c0f540 <unknown>
+#3 0x5c1327c0f731 <unknown>
+#4 0x5c1327c5d824 <unknown>
+#5 0x5c1327c3505d <unknown>
+#6 0x5c1327c5ac23 <unknown>
+#7 0x5c1327c34e03 <unknown>
+#8 0x5c1327c01968 <unknown>
+#9 0x5c1327c025e1 <unknown>
+#10 0x5c132810c548 <unknown>
+#11 0x5c1328110272 <unknown>
+#12 0x5c13280f3313 <unknown>
+#13 0x5c1328110dc5 <unknown>
+#14 0x5c13280d849f <unknown>
+#15 0x5c1328135158 <unknown>
+#16 0x5c1328135332 <unknown>
+#17 0x5c1328147a53 <unknown>
+#18 0x763a9ba9caa4 <unknown>
+#19 0x763a9bb29c3c <unknown>
+
+2025-09-12 00:09:17,622 - AutoBooking - INFO - 开始自动预订: D3
+2025-09-12 00:09:17,622 - AutoBooking - INFO - 开始自动预订: D3
+2025-09-12 00:09:17,623 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:09:17,623 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:09:30,167 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:09:30,167 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:09:30,287 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:09:30,287 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:09:30,288 - AutoBooking - INFO - 开始搜索车票...
+2025-09-12 00:09:30,288 - AutoBooking - INFO - 开始搜索车票...
+2025-09-12 00:09:32,956 - AutoBooking - INFO - 车票搜索成功
+2025-09-12 00:09:32,956 - AutoBooking - INFO - 车票搜索成功
+2025-09-12 00:09:32,956 - AutoBooking - INFO - 选择车次: D3
+2025-09-12 00:09:32,956 - AutoBooking - INFO - 选择车次: D3
+2025-09-12 00:09:35,018 - AutoBooking - INFO - 找到 5 个车次行
+2025-09-12 00:09:35,018 - AutoBooking - INFO - 找到 5 个车次行
+2025-09-12 00:09:35,163 - AutoBooking - INFO - 策略1 - td1文本: 'K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达'
+2025-09-12 00:09:35,163 - AutoBooking - INFO - 策略1 - td1文本: 'K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达'
+2025-09-12 00:09:35,193 - AutoBooking - INFO - 策略2 - td1//a文本: 'K507'
+2025-09-12 00:09:35,193 - AutoBooking - INFO - 策略2 - td1//a文本: 'K507'
+2025-09-12 00:09:35,194 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='K507'
+2025-09-12 00:09:35,194 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='K507'
+2025-09-12 00:09:35,214 - AutoBooking - INFO - 检查行文本匹配: 目标='D3', 行文本='K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达
+-- -- -- -- -- 11 有 -- 有 有 -- 预订...'
+2025-09-12 00:09:35,214 - AutoBooking - INFO - 检查行文本匹配: 目标='D3', 行文本='K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达
+-- -- -- -- -- 11 有 -- 有 有 -- 预订...'
+2025-09-12 00:09:35,281 - AutoBooking - INFO - 策略1 - td1文本: 'D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:09:35,281 - AutoBooking - INFO - 策略1 - td1文本: 'D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:09:35,281 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:09:35,281 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:09:35,282 - AutoBooking - INFO - 找到目标车次 D3 (实际显示: D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达)，尝试点击预订按钮...
+2025-09-12 00:09:35,282 - AutoBooking - INFO - 找到目标车次 D3 (实际显示: D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达)，尝试点击预订按钮...
+2025-09-12 00:09:35,316 - AutoBooking - INFO - 在车次 D3 行找到 1 个预订按钮
+2025-09-12 00:09:35,316 - AutoBooking - INFO - 在车次 D3 行找到 1 个预订按钮
+2025-09-12 00:09:35,434 - AutoBooking - INFO - 车次 D3 选择成功 (策略1-按钮1)
+2025-09-12 00:09:35,434 - AutoBooking - INFO - 车次 D3 选择成功 (策略1-按钮1)
+2025-09-12 00:09:35,435 - AutoBooking - INFO - 选择乘客和席次...
+2025-09-12 00:09:35,435 - AutoBooking - INFO - 选择乘客和席次...
+2025-09-12 00:09:36,179 - AutoBooking - WARNING - 未找到乘客 陈岩
+2025-09-12 00:09:36,179 - AutoBooking - WARNING - 未找到乘客 陈岩
+2025-09-12 00:09:36,180 - AutoBooking - WARNING - 未找到乘客 鞠放
+2025-09-12 00:09:36,180 - AutoBooking - WARNING - 未找到乘客 鞠放
+2025-09-12 00:09:36,180 - AutoBooking - INFO - 乘客和席次选择完成
+2025-09-12 00:09:36,180 - AutoBooking - INFO - 乘客和席次选择完成
+2025-09-12 00:09:36,181 - AutoBooking - INFO - 提交订单...
+2025-09-12 00:09:36,181 - AutoBooking - INFO - 提交订单...
+2025-09-12 00:09:38,812 - AutoBooking - INFO - 订单提交成功
+2025-09-12 00:09:38,812 - AutoBooking - INFO - 订单提交成功
+2025-09-12 00:09:38,814 - AutoBooking - INFO - 确认订单...
+2025-09-12 00:09:38,814 - AutoBooking - INFO - 确认订单...
+2025-09-12 00:09:38,911 - AutoBooking - ERROR - 确认订单失败: Message: element not interactable
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#elementnotinteractableexception
+Stacktrace:
+#0 0x5c132814894a <unknown>
+#1 0x5c1327bbd6f3 <unknown>
+#2 0x5c1327c1074e <unknown>
+#3 0x5c1327c0378b <unknown>
+#4 0x5c1327c35032 <unknown>
+#5 0x5c1327c03107 <unknown>
+#6 0x5c1327c351fe <unknown>
+#7 0x5c1327c5ac23 <unknown>
+#8 0x5c1327c34e03 <unknown>
+#9 0x5c1327c01968 <unknown>
+#10 0x5c1327c025e1 <unknown>
+#11 0x5c132810c548 <unknown>
+#12 0x5c1328110272 <unknown>
+#13 0x5c13280f3313 <unknown>
+#14 0x5c1328110dc5 <unknown>
+#15 0x5c13280d849f <unknown>
+#16 0x5c1328135158 <unknown>
+#17 0x5c1328135332 <unknown>
+#18 0x5c1328147a53 <unknown>
+#19 0x763a9ba9caa4 <unknown>
+#20 0x763a9bb29c3c <unknown>
+
+2025-09-12 00:09:38,911 - AutoBooking - ERROR - 确认订单失败: Message: element not interactable
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#elementnotinteractableexception
+Stacktrace:
+#0 0x5c132814894a <unknown>
+#1 0x5c1327bbd6f3 <unknown>
+#2 0x5c1327c1074e <unknown>
+#3 0x5c1327c0378b <unknown>
+#4 0x5c1327c35032 <unknown>
+#5 0x5c1327c03107 <unknown>
+#6 0x5c1327c351fe <unknown>
+#7 0x5c1327c5ac23 <unknown>
+#8 0x5c1327c34e03 <unknown>
+#9 0x5c1327c01968 <unknown>
+#10 0x5c1327c025e1 <unknown>
+#11 0x5c132810c548 <unknown>
+#12 0x5c1328110272 <unknown>
+#13 0x5c13280f3313 <unknown>
+#14 0x5c1328110dc5 <unknown>
+#15 0x5c13280d849f <unknown>
+#16 0x5c1328135158 <unknown>
+#17 0x5c1328135332 <unknown>
+#18 0x5c1328147a53 <unknown>
+#19 0x763a9ba9caa4 <unknown>
+#20 0x763a9bb29c3c <unknown>
+
+2025-09-12 00:10:47,168 - AutoBooking - INFO - 浏览器已关闭
+2025-09-12 00:10:47,168 - AutoBooking - INFO - 浏览器已关闭
+2025-09-12 00:13:06,471 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:13:06,471 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:13:06,535 - AutoBooking - INFO - Chrome版本: Google Chrome 140.0.7339.127
+2025-09-12 00:13:06,535 - AutoBooking - INFO - Chrome版本: Google Chrome 140.0.7339.127
+2025-09-12 00:13:07,167 - AutoBooking - INFO - 浏览器驱动初始化成功
+2025-09-12 00:13:07,167 - AutoBooking - INFO - 浏览器驱动初始化成功
+2025-09-12 00:13:17,459 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:13:17,459 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:13:33,956 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:13:33,956 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:13:48,178 - AutoBooking - INFO - 开始自动预订: D3
+2025-09-12 00:13:48,178 - AutoBooking - INFO - 开始自动预订: D3
+2025-09-12 00:13:48,179 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:13:48,179 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:13:57,147 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:13:57,147 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:13:57,249 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:13:57,249 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:13:57,249 - AutoBooking - INFO - 开始搜索车票...
+2025-09-12 00:13:57,249 - AutoBooking - INFO - 开始搜索车票...
+2025-09-12 00:13:59,976 - AutoBooking - INFO - 车票搜索成功
+2025-09-12 00:13:59,976 - AutoBooking - INFO - 车票搜索成功
+2025-09-12 00:13:59,977 - AutoBooking - INFO - 选择车次: D3
+2025-09-12 00:13:59,977 - AutoBooking - INFO - 选择车次: D3
+2025-09-12 00:14:01,990 - AutoBooking - INFO - 找到 5 个车次行
+2025-09-12 00:14:01,990 - AutoBooking - INFO - 找到 5 个车次行
+2025-09-12 00:14:02,043 - AutoBooking - INFO - 策略1 - td1文本: 'K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达'
+2025-09-12 00:14:02,043 - AutoBooking - INFO - 策略1 - td1文本: 'K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达'
+2025-09-12 00:14:02,069 - AutoBooking - INFO - 策略2 - td1//a文本: 'K507'
+2025-09-12 00:14:02,069 - AutoBooking - INFO - 策略2 - td1//a文本: 'K507'
+2025-09-12 00:14:02,070 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='K507'
+2025-09-12 00:14:02,070 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='K507'
+2025-09-12 00:14:02,090 - AutoBooking - INFO - 检查行文本匹配: 目标='D3', 行文本='K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达
+-- -- -- -- -- 11 有 -- 有 有 -- 预订...'
+2025-09-12 00:14:02,090 - AutoBooking - INFO - 检查行文本匹配: 目标='D3', 行文本='K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达
+-- -- -- -- -- 11 有 -- 有 有 -- 预订...'
+2025-09-12 00:14:02,145 - AutoBooking - INFO - 策略1 - td1文本: 'D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:14:02,145 - AutoBooking - INFO - 策略1 - td1文本: 'D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:14:02,146 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:14:02,146 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:14:02,146 - AutoBooking - INFO - 找到目标车次 D3 (实际显示: D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达)，尝试点击预订按钮...
+2025-09-12 00:14:02,146 - AutoBooking - INFO - 找到目标车次 D3 (实际显示: D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达)，尝试点击预订按钮...
+2025-09-12 00:14:02,172 - AutoBooking - INFO - 在车次 D3 行找到 1 个预订按钮
+2025-09-12 00:14:02,172 - AutoBooking - INFO - 在车次 D3 行找到 1 个预订按钮
+2025-09-12 00:14:02,270 - AutoBooking - INFO - 车次 D3 选择成功 (策略1-按钮1)
+2025-09-12 00:14:02,270 - AutoBooking - INFO - 车次 D3 选择成功 (策略1-按钮1)
+2025-09-12 00:14:02,270 - AutoBooking - INFO - 选择乘客和席次...
+2025-09-12 00:14:02,270 - AutoBooking - INFO - 选择乘客和席次...
+2025-09-12 00:14:03,131 - AutoBooking - INFO - 通过normal_passenger_id找到 0 个乘客行
+2025-09-12 00:14:03,131 - AutoBooking - INFO - 通过normal_passenger_id找到 0 个乘客行
+2025-09-12 00:14:03,157 - AutoBooking - INFO - 通过备用策略找到 0 个乘客行
+2025-09-12 00:14:03,157 - AutoBooking - INFO - 通过备用策略找到 0 个乘客行
+2025-09-12 00:14:03,187 - AutoBooking - INFO - 找到 10 个复选框
+2025-09-12 00:14:03,187 - AutoBooking - INFO - 找到 10 个复选框
+2025-09-12 00:14:03,487 - AutoBooking - INFO - 通过复选框找到 0 个乘客行
+2025-09-12 00:14:03,487 - AutoBooking - INFO - 通过复选框找到 0 个乘客行
+2025-09-12 00:14:03,488 - AutoBooking - ERROR - 未找到任何乘客行
+2025-09-12 00:14:03,488 - AutoBooking - ERROR - 未找到任何乘客行
+2025-09-12 00:14:58,072 - AutoBooking - INFO - 浏览器已关闭
+2025-09-12 00:14:58,072 - AutoBooking - INFO - 浏览器已关闭
+2025-09-12 00:18:12,130 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:18:12,130 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:18:12,205 - AutoBooking - INFO - Chrome版本: Google Chrome 140.0.7339.127
+2025-09-12 00:18:12,205 - AutoBooking - INFO - Chrome版本: Google Chrome 140.0.7339.127
+2025-09-12 00:18:13,042 - AutoBooking - INFO - 浏览器驱动初始化成功
+2025-09-12 00:18:13,042 - AutoBooking - INFO - 浏览器驱动初始化成功
+2025-09-12 00:18:22,889 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:18:22,889 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:18:38,207 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:18:38,207 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:18:54,683 - AutoBooking - INFO - 开始自动预订: D3
+2025-09-12 00:18:54,683 - AutoBooking - INFO - 开始自动预订: D3
+2025-09-12 00:18:54,684 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:18:54,684 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:19:06,917 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:19:06,917 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:19:06,994 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:19:06,994 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:19:06,995 - AutoBooking - INFO - 开始搜索车票...
+2025-09-12 00:19:06,995 - AutoBooking - INFO - 开始搜索车票...
+2025-09-12 00:19:09,669 - AutoBooking - INFO - 车票搜索成功
+2025-09-12 00:19:09,669 - AutoBooking - INFO - 车票搜索成功
+2025-09-12 00:19:09,670 - AutoBooking - INFO - 选择车次: D3
+2025-09-12 00:19:09,670 - AutoBooking - INFO - 选择车次: D3
+2025-09-12 00:19:11,718 - AutoBooking - INFO - 找到 5 个车次行
+2025-09-12 00:19:11,718 - AutoBooking - INFO - 找到 5 个车次行
+2025-09-12 00:19:11,801 - AutoBooking - INFO - 策略1 - td1文本: 'K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达'
+2025-09-12 00:19:11,801 - AutoBooking - INFO - 策略1 - td1文本: 'K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达'
+2025-09-12 00:19:11,829 - AutoBooking - INFO - 策略2 - td1//a文本: 'K507'
+2025-09-12 00:19:11,829 - AutoBooking - INFO - 策略2 - td1//a文本: 'K507'
+2025-09-12 00:19:11,829 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='K507'
+2025-09-12 00:19:11,829 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='K507'
+2025-09-12 00:19:11,846 - AutoBooking - INFO - 检查行文本匹配: 目标='D3', 行文本='K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达
+-- -- -- -- -- 11 有 -- 有 有 -- 预订...'
+2025-09-12 00:19:11,846 - AutoBooking - INFO - 检查行文本匹配: 目标='D3', 行文本='K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达
+-- -- -- -- -- 11 有 -- 有 有 -- 预订...'
+2025-09-12 00:19:11,903 - AutoBooking - INFO - 策略1 - td1文本: 'D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:19:11,903 - AutoBooking - INFO - 策略1 - td1文本: 'D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:19:11,903 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:19:11,903 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:19:11,904 - AutoBooking - INFO - 找到目标车次 D3 (实际显示: D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达)，尝试点击预订按钮...
+2025-09-12 00:19:11,904 - AutoBooking - INFO - 找到目标车次 D3 (实际显示: D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达)，尝试点击预订按钮...
+2025-09-12 00:19:11,932 - AutoBooking - INFO - 在车次 D3 行找到 1 个预订按钮
+2025-09-12 00:19:11,932 - AutoBooking - INFO - 在车次 D3 行找到 1 个预订按钮
+2025-09-12 00:19:12,040 - AutoBooking - INFO - 车次 D3 选择成功 (策略1-按钮1)
+2025-09-12 00:19:12,040 - AutoBooking - INFO - 车次 D3 选择成功 (策略1-按钮1)
+2025-09-12 00:19:12,041 - AutoBooking - INFO - 选择乘客和席次...
+2025-09-12 00:19:12,041 - AutoBooking - INFO - 选择乘客和席次...
+2025-09-12 00:19:14,078 - AutoBooking - INFO - 找到 2 个iframe
+2025-09-12 00:19:14,078 - AutoBooking - INFO - 找到 2 个iframe
+2025-09-12 00:19:14,107 - AutoBooking - INFO - 切换到iframe 1
+2025-09-12 00:19:14,107 - AutoBooking - INFO - 切换到iframe 1
+2025-09-12 00:19:14,151 - AutoBooking - INFO - 切换到iframe 2
+2025-09-12 00:19:14,151 - AutoBooking - INFO - 切换到iframe 2
+2025-09-12 00:19:14,166 - AutoBooking - INFO - 在主文档中查找乘客信息
+2025-09-12 00:19:14,166 - AutoBooking - INFO - 在主文档中查找乘客信息
+2025-09-12 00:19:14,183 - AutoBooking - INFO - 通过normal_passenger_id找到乘客选择区域
+2025-09-12 00:19:14,183 - AutoBooking - INFO - 通过normal_passenger_id找到乘客选择区域
+2025-09-12 00:19:14,194 - AutoBooking - INFO - 策略1成功找到乘客容器
+2025-09-12 00:19:14,194 - AutoBooking - INFO - 策略1成功找到乘客容器
+2025-09-12 00:19:14,209 - AutoBooking - INFO - 通过normal_passenger_id找到 0 个乘客行
+2025-09-12 00:19:14,209 - AutoBooking - INFO - 通过normal_passenger_id找到 0 个乘客行
+2025-09-12 00:19:14,224 - AutoBooking - INFO - 通过备用策略找到 0 个乘客行
+2025-09-12 00:19:14,224 - AutoBooking - INFO - 通过备用策略找到 0 个乘客行
+2025-09-12 00:19:14,239 - AutoBooking - INFO - 找到 10 个复选框
+2025-09-12 00:19:14,239 - AutoBooking - INFO - 找到 10 个复选框
+2025-09-12 00:19:14,378 - AutoBooking - INFO - 通过复选框找到 0 个乘客行
+2025-09-12 00:19:14,378 - AutoBooking - INFO - 通过复选框找到 0 个乘客行
+2025-09-12 00:19:14,378 - AutoBooking - ERROR - 未找到任何乘客行
+2025-09-12 00:19:14,378 - AutoBooking - ERROR - 未找到任何乘客行
+2025-09-12 00:20:35,575 - AutoBooking - INFO - 浏览器已关闭
+2025-09-12 00:20:35,575 - AutoBooking - INFO - 浏览器已关闭
+2025-09-12 00:29:09,679 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:29:09,679 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:29:09,732 - AutoBooking - INFO - Chrome版本: Google Chrome 140.0.7339.127
+2025-09-12 00:29:09,732 - AutoBooking - INFO - Chrome版本: Google Chrome 140.0.7339.127
+2025-09-12 00:29:10,444 - AutoBooking - INFO - 浏览器驱动初始化成功
+2025-09-12 00:29:10,444 - AutoBooking - INFO - 浏览器驱动初始化成功
+2025-09-12 00:29:23,221 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:29:23,221 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:30:04,117 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:30:04,117 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:30:21,599 - AutoBooking - INFO - 开始自动预订: D3
+2025-09-12 00:30:21,599 - AutoBooking - INFO - 开始自动预订: D3
+2025-09-12 00:30:21,600 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:30:21,600 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:30:34,073 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:30:34,073 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:30:34,144 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:30:34,144 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:30:34,144 - AutoBooking - INFO - 开始搜索车票...
+2025-09-12 00:30:34,144 - AutoBooking - INFO - 开始搜索车票...
+2025-09-12 00:30:34,328 - AutoBooking - INFO - 车票搜索成功
+2025-09-12 00:30:34,328 - AutoBooking - INFO - 车票搜索成功
+2025-09-12 00:30:34,329 - AutoBooking - INFO - 选择车次: D3
+2025-09-12 00:30:34,329 - AutoBooking - INFO - 选择车次: D3
+2025-09-12 00:30:36,380 - AutoBooking - INFO - 找到 5 个车次行
+2025-09-12 00:30:36,380 - AutoBooking - INFO - 找到 5 个车次行
+2025-09-12 00:30:36,442 - AutoBooking - INFO - 策略1 - td1文本: 'K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达'
+2025-09-12 00:30:36,442 - AutoBooking - INFO - 策略1 - td1文本: 'K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达'
+2025-09-12 00:30:36,469 - AutoBooking - INFO - 策略2 - td1//a文本: 'K507'
+2025-09-12 00:30:36,469 - AutoBooking - INFO - 策略2 - td1//a文本: 'K507'
+2025-09-12 00:30:36,469 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='K507'
+2025-09-12 00:30:36,469 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='K507'
+2025-09-12 00:30:36,485 - AutoBooking - INFO - 检查行文本匹配: 目标='D3', 行文本='K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达
+-- -- -- -- -- 11 有 -- 有 有 -- 预订...'
+2025-09-12 00:30:36,485 - AutoBooking - INFO - 检查行文本匹配: 目标='D3', 行文本='K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达
+-- -- -- -- -- 11 有 -- 有 有 -- 预订...'
+2025-09-12 00:30:36,538 - AutoBooking - INFO - 策略1 - td1文本: 'D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:30:36,538 - AutoBooking - INFO - 策略1 - td1文本: 'D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:30:36,538 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:30:36,538 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:30:36,538 - AutoBooking - INFO - 找到目标车次 D3 (实际显示: D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达)，尝试点击预订按钮...
+2025-09-12 00:30:36,538 - AutoBooking - INFO - 找到目标车次 D3 (实际显示: D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达)，尝试点击预订按钮...
+2025-09-12 00:30:36,565 - AutoBooking - INFO - 在车次 D3 行找到 1 个预订按钮
+2025-09-12 00:30:36,565 - AutoBooking - INFO - 在车次 D3 行找到 1 个预订按钮
+2025-09-12 00:30:36,663 - AutoBooking - INFO - 车次 D3 选择成功 (策略1-按钮1)
+2025-09-12 00:30:36,663 - AutoBooking - INFO - 车次 D3 选择成功 (策略1-按钮1)
+2025-09-12 00:30:36,663 - AutoBooking - INFO - 选择乘客和席次...
+2025-09-12 00:30:36,663 - AutoBooking - INFO - 选择乘客和席次...
+2025-09-12 00:30:38,737 - AutoBooking - INFO - 找到 2 个iframe
+2025-09-12 00:30:38,737 - AutoBooking - INFO - 找到 2 个iframe
+2025-09-12 00:30:38,777 - AutoBooking - INFO - 切换到iframe 1
+2025-09-12 00:30:38,777 - AutoBooking - INFO - 切换到iframe 1
+2025-09-12 00:30:38,826 - AutoBooking - INFO - 切换到iframe 2
+2025-09-12 00:30:38,826 - AutoBooking - INFO - 切换到iframe 2
+2025-09-12 00:30:38,842 - AutoBooking - INFO - 在主文档中查找乘客信息
+2025-09-12 00:30:38,842 - AutoBooking - INFO - 在主文档中查找乘客信息
+2025-09-12 00:30:38,846 - AutoBooking - INFO - 开始使用搜索框选择乘客...
+2025-09-12 00:30:38,846 - AutoBooking - INFO - 开始使用搜索框选择乘客...
+2025-09-12 00:30:38,846 - AutoBooking - INFO - 需要选择的乘客列表: ['陈岩', '鞠放']
+2025-09-12 00:30:38,846 - AutoBooking - INFO - 需要选择的乘客列表: ['陈岩', '鞠放']
+2025-09-12 00:30:38,861 - AutoBooking - INFO - ✓ 找到乘客搜索框 (ID: quickQueryPassenger_id)
+2025-09-12 00:30:38,861 - AutoBooking - INFO - ✓ 找到乘客搜索框 (ID: quickQueryPassenger_id)
+2025-09-12 00:30:38,923 - AutoBooking - INFO - ✓ 清空搜索框
+2025-09-12 00:30:38,923 - AutoBooking - INFO - ✓ 清空搜索框
+2025-09-12 00:30:39,081 - AutoBooking - INFO - 🔍 开始搜索乘客: 陈岩
+2025-09-12 00:30:39,081 - AutoBooking - INFO - 🔍 开始搜索乘客: 陈岩
+2025-09-12 00:30:39,167 - AutoBooking - INFO - ✓ 在搜索框中输入: '陈岩'
+2025-09-12 00:30:39,167 - AutoBooking - INFO - ✓ 在搜索框中输入: '陈岩'
+2025-09-12 00:30:40,334 - AutoBooking - INFO -   模式1找到 0 个匹配的复选框
+2025-09-12 00:30:40,334 - AutoBooking - INFO -   模式1找到 0 个匹配的复选框
+2025-09-12 00:30:40,350 - AutoBooking - INFO -   模式2找到 0 个匹配的复选框
+2025-09-12 00:30:40,350 - AutoBooking - INFO -   模式2找到 0 个匹配的复选框
+2025-09-12 00:30:40,364 - AutoBooking - INFO -   模式3找到 0 个匹配的复选框
+2025-09-12 00:30:40,364 - AutoBooking - INFO -   模式3找到 0 个匹配的复选框
+2025-09-12 00:30:40,381 - AutoBooking - INFO -   找到 0 个可能的乘客行
+2025-09-12 00:30:40,381 - AutoBooking - INFO -   找到 0 个可能的乘客行
+2025-09-12 00:30:40,390 - AutoBooking - WARNING - ❌ 无法通过搜索选中乘客 陈岩
+2025-09-12 00:30:40,390 - AutoBooking - WARNING - ❌ 无法通过搜索选中乘客 陈岩
+2025-09-12 00:30:40,412 - AutoBooking - INFO -   页面中包含乘客姓名 '陈岩'，但可能结构不匹配
+2025-09-12 00:30:40,412 - AutoBooking - INFO -   页面中包含乘客姓名 '陈岩'，但可能结构不匹配
+2025-09-12 00:30:40,450 - AutoBooking - INFO - 🔍 开始搜索乘客: 鞠放
+2025-09-12 00:30:40,450 - AutoBooking - INFO - 🔍 开始搜索乘客: 鞠放
+2025-09-12 00:30:40,535 - AutoBooking - INFO - ✓ 在搜索框中输入: '鞠放'
+2025-09-12 00:30:40,535 - AutoBooking - INFO - ✓ 在搜索框中输入: '鞠放'
+2025-09-12 00:30:41,813 - AutoBooking - INFO -   模式1找到 0 个匹配的复选框
+2025-09-12 00:30:41,813 - AutoBooking - INFO -   模式1找到 0 个匹配的复选框
+2025-09-12 00:30:41,828 - AutoBooking - INFO -   模式2找到 0 个匹配的复选框
+2025-09-12 00:30:41,828 - AutoBooking - INFO -   模式2找到 0 个匹配的复选框
+2025-09-12 00:30:41,843 - AutoBooking - INFO -   模式3找到 0 个匹配的复选框
+2025-09-12 00:30:41,843 - AutoBooking - INFO -   模式3找到 0 个匹配的复选框
+2025-09-12 00:30:41,853 - AutoBooking - INFO -   找到 0 个可能的乘客行
+2025-09-12 00:30:41,853 - AutoBooking - INFO -   找到 0 个可能的乘客行
+2025-09-12 00:30:41,863 - AutoBooking - WARNING - ❌ 无法通过搜索选中乘客 鞠放
+2025-09-12 00:30:41,863 - AutoBooking - WARNING - ❌ 无法通过搜索选中乘客 鞠放
+2025-09-12 00:30:41,881 - AutoBooking - WARNING -   页面中未找到乘客姓名 '鞠放'
+2025-09-12 00:30:41,881 - AutoBooking - WARNING -   页面中未找到乘客姓名 '鞠放'
+2025-09-12 00:30:41,917 - AutoBooking - INFO - 🎉 乘客搜索选择完成
+2025-09-12 00:30:41,917 - AutoBooking - INFO - 🎉 乘客搜索选择完成
+2025-09-12 00:30:41,918 - AutoBooking - INFO - 提交订单...
+2025-09-12 00:30:41,918 - AutoBooking - INFO - 提交订单...
+2025-09-12 00:30:44,517 - AutoBooking - INFO - 订单提交成功
+2025-09-12 00:30:44,517 - AutoBooking - INFO - 订单提交成功
+2025-09-12 00:30:44,519 - AutoBooking - INFO - 确认订单...
+2025-09-12 00:30:44,519 - AutoBooking - INFO - 确认订单...
+2025-09-12 00:30:44,621 - AutoBooking - ERROR - 确认订单失败: Message: element not interactable
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#elementnotinteractableexception
+Stacktrace:
+#0 0x588a95bce94a <unknown>
+#1 0x588a956436f3 <unknown>
+#2 0x588a9569674e <unknown>
+#3 0x588a9568978b <unknown>
+#4 0x588a956bb032 <unknown>
+#5 0x588a95689107 <unknown>
+#6 0x588a956bb1fe <unknown>
+#7 0x588a956e0c23 <unknown>
+#8 0x588a956bae03 <unknown>
+#9 0x588a95687968 <unknown>
+#10 0x588a956885e1 <unknown>
+#11 0x588a95b92548 <unknown>
+#12 0x588a95b96272 <unknown>
+#13 0x588a95b79313 <unknown>
+#14 0x588a95b96dc5 <unknown>
+#15 0x588a95b5e49f <unknown>
+#16 0x588a95bbb158 <unknown>
+#17 0x588a95bbb332 <unknown>
+#18 0x588a95bcda53 <unknown>
+#19 0x7d54ec89caa4 <unknown>
+#20 0x7d54ec929c3c <unknown>
+
+2025-09-12 00:30:44,621 - AutoBooking - ERROR - 确认订单失败: Message: element not interactable
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#elementnotinteractableexception
+Stacktrace:
+#0 0x588a95bce94a <unknown>
+#1 0x588a956436f3 <unknown>
+#2 0x588a9569674e <unknown>
+#3 0x588a9568978b <unknown>
+#4 0x588a956bb032 <unknown>
+#5 0x588a95689107 <unknown>
+#6 0x588a956bb1fe <unknown>
+#7 0x588a956e0c23 <unknown>
+#8 0x588a956bae03 <unknown>
+#9 0x588a95687968 <unknown>
+#10 0x588a956885e1 <unknown>
+#11 0x588a95b92548 <unknown>
+#12 0x588a95b96272 <unknown>
+#13 0x588a95b79313 <unknown>
+#14 0x588a95b96dc5 <unknown>
+#15 0x588a95b5e49f <unknown>
+#16 0x588a95bbb158 <unknown>
+#17 0x588a95bbb332 <unknown>
+#18 0x588a95bcda53 <unknown>
+#19 0x7d54ec89caa4 <unknown>
+#20 0x7d54ec929c3c <unknown>
+
+2025-09-12 00:31:44,600 - AutoBooking - INFO - 浏览器已关闭
+2025-09-12 00:31:44,600 - AutoBooking - INFO - 浏览器已关闭
+2025-09-12 00:36:30,578 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:36:30,578 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:36:30,637 - AutoBooking - INFO - Chrome版本: Google Chrome 140.0.7339.127
+2025-09-12 00:36:30,637 - AutoBooking - INFO - Chrome版本: Google Chrome 140.0.7339.127
+2025-09-12 00:36:31,388 - AutoBooking - INFO - 浏览器驱动初始化成功
+2025-09-12 00:36:31,388 - AutoBooking - INFO - 浏览器驱动初始化成功
+2025-09-12 00:36:44,218 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:36:44,218 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:36:54,819 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:36:54,819 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:37:05,230 - AutoBooking - INFO - 开始自动预订: D3
+2025-09-12 00:37:05,230 - AutoBooking - INFO - 开始自动预订: D3
+2025-09-12 00:37:05,231 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:37:05,231 - AutoBooking - INFO - 打开浏览器，等待人工登录...
+2025-09-12 00:37:17,639 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:37:17,639 - AutoBooking - INFO - 搜索表单填充完成
+2025-09-12 00:37:17,784 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:37:17,784 - AutoBooking - INFO - 检测到用户已登录
+2025-09-12 00:37:17,784 - AutoBooking - INFO - 开始搜索车票...
+2025-09-12 00:37:17,784 - AutoBooking - INFO - 开始搜索车票...
+2025-09-12 00:37:20,468 - AutoBooking - INFO - 车票搜索成功
+2025-09-12 00:37:20,468 - AutoBooking - INFO - 车票搜索成功
+2025-09-12 00:37:20,478 - AutoBooking - INFO - 选择车次: D3
+2025-09-12 00:37:20,478 - AutoBooking - INFO - 选择车次: D3
+2025-09-12 00:37:22,524 - AutoBooking - INFO - 找到 5 个车次行
+2025-09-12 00:37:22,524 - AutoBooking - INFO - 找到 5 个车次行
+2025-09-12 00:37:22,641 - AutoBooking - INFO - 策略1 - td1文本: 'K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达'
+2025-09-12 00:37:22,641 - AutoBooking - INFO - 策略1 - td1文本: 'K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达'
+2025-09-12 00:37:22,671 - AutoBooking - INFO - 策略2 - td1//a文本: 'K507'
+2025-09-12 00:37:22,671 - AutoBooking - INFO - 策略2 - td1//a文本: 'K507'
+2025-09-12 00:37:22,672 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='K507'
+2025-09-12 00:37:22,672 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='K507'
+2025-09-12 00:37:22,694 - AutoBooking - INFO - 检查行文本匹配: 目标='D3', 行文本='K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达
+-- -- -- -- -- 11 有 -- 有 有 -- 预订...'
+2025-09-12 00:37:22,694 - AutoBooking - INFO - 检查行文本匹配: 目标='D3', 行文本='K507
+铺
+北京西
+涪陵
+07:12
+10:30
+27:18
+次日到达
+-- -- -- -- -- 11 有 -- 有 有 -- 预订...'
+2025-09-12 00:37:22,768 - AutoBooking - INFO - 策略1 - td1文本: 'D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:37:22,768 - AutoBooking - INFO - 策略1 - td1文本: 'D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:37:22,769 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:37:22,769 - AutoBooking - INFO - 检查车次: 目标='D3', 实际='D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达'
+2025-09-12 00:37:22,769 - AutoBooking - INFO - 找到目标车次 D3 (实际显示: D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达)，尝试点击预订按钮...
+2025-09-12 00:37:22,769 - AutoBooking - INFO - 找到目标车次 D3 (实际显示: D3
+复铺
+北京西
+涪陵北
+18:05
+11:09
+17:04
+次日到达)，尝试点击预订按钮...
+2025-09-12 00:37:22,800 - AutoBooking - INFO - 在车次 D3 行找到 1 个预订按钮
+2025-09-12 00:37:22,800 - AutoBooking - INFO - 在车次 D3 行找到 1 个预订按钮
+2025-09-12 00:37:22,900 - AutoBooking - INFO - 车次 D3 选择成功 (策略1-按钮1)
+2025-09-12 00:37:22,900 - AutoBooking - INFO - 车次 D3 选择成功 (策略1-按钮1)
+2025-09-12 00:37:22,900 - AutoBooking - INFO - 选择乘客和席次...
+2025-09-12 00:37:22,900 - AutoBooking - INFO - 选择乘客和席次...
+2025-09-12 00:37:22,514 - AutoBooking - INFO - 找到 2 个iframe
+2025-09-12 00:37:22,514 - AutoBooking - INFO - 找到 2 个iframe
+2025-09-12 00:37:22,614 - AutoBooking - INFO - 切换到iframe 1
+2025-09-12 00:37:22,614 - AutoBooking - INFO - 切换到iframe 1
+2025-09-12 00:37:22,660 - AutoBooking - INFO - 切换到iframe 2
+2025-09-12 00:37:22,660 - AutoBooking - INFO - 切换到iframe 2
+2025-09-12 00:37:22,676 - AutoBooking - INFO - 在主文档中查找乘客信息
+2025-09-12 00:37:22,676 - AutoBooking - INFO - 在主文档中查找乘客信息
+2025-09-12 00:37:22,680 - AutoBooking - INFO - 开始使用搜索框选择乘客...
+2025-09-12 00:37:22,680 - AutoBooking - INFO - 开始使用搜索框选择乘客...
+2025-09-12 00:37:22,681 - AutoBooking - INFO - 需要选择的乘客列表: ['陈岩', '鞠放']
+2025-09-12 00:37:22,681 - AutoBooking - INFO - 需要选择的乘客列表: ['陈岩', '鞠放']
+2025-09-12 00:37:22,695 - AutoBooking - INFO - ✓ 找到乘客搜索框 (ID: quickQueryPassenger_id)
+2025-09-12 00:37:22,695 - AutoBooking - INFO - ✓ 找到乘客搜索框 (ID: quickQueryPassenger_id)
+2025-09-12 00:37:22,708 - AutoBooking - INFO - ✓ 找到搜索按钮 (ID: submit_quickQueryPassenger)
+2025-09-12 00:37:22,708 - AutoBooking - INFO - ✓ 找到搜索按钮 (ID: submit_quickQueryPassenger)
+2025-09-12 00:37:22,772 - AutoBooking - INFO - ✓ 清空搜索框
+2025-09-12 00:37:22,772 - AutoBooking - INFO - ✓ 清空搜索框
+2025-09-12 00:37:22,928 - AutoBooking - INFO - 🔍 开始搜索乘客: 陈岩
+2025-09-12 00:37:22,928 - AutoBooking - INFO - 🔍 开始搜索乘客: 陈岩
+2025-09-12 00:37:23,479 - AutoBooking - INFO - 尝试拼音首字母搜索: '陈岩'
+2025-09-12 00:37:23,479 - AutoBooking - INFO - 尝试拼音首字母搜索: '陈岩'
+2025-09-12 00:37:23,744 - AutoBooking - INFO - ✓ 点击搜索按钮
+2025-09-12 00:37:23,744 - AutoBooking - INFO - ✓ 点击搜索按钮
+2025-09-12 00:37:24,853 - AutoBooking - INFO - 拼音搜索未找到 陈岩，尝试其他方式
+2025-09-12 00:37:24,853 - AutoBooking - INFO - 拼音搜索未找到 陈岩，尝试其他方式
+2025-09-12 00:37:24,853 - AutoBooking - ERROR - ❌ 选择乘客 陈岩 失败: cannot access local variable 'passenger_selected' where it is not associated with a value
+2025-09-12 00:37:24,853 - AutoBooking - ERROR - ❌ 选择乘客 陈岩 失败: cannot access local variable 'passenger_selected' where it is not associated with a value
+2025-09-12 00:37:24,869 - AutoBooking - INFO - 🔍 开始搜索乘客: 鞠放
+2025-09-12 00:37:24,869 - AutoBooking - INFO - 🔍 开始搜索乘客: 鞠放
+2025-09-12 00:37:25,414 - AutoBooking - INFO - 尝试拼音首字母搜索: '鞠放'
+2025-09-12 00:37:25,414 - AutoBooking - INFO - 尝试拼音首字母搜索: '鞠放'
+2025-09-12 00:37:25,672 - AutoBooking - INFO - ✓ 点击搜索按钮
+2025-09-12 00:37:25,672 - AutoBooking - INFO - ✓ 点击搜索按钮
+2025-09-12 00:37:26,821 - AutoBooking - INFO - 拼音搜索未找到 鞠放，尝试其他方式
+2025-09-12 00:37:26,821 - AutoBooking - INFO - 拼音搜索未找到 鞠放，尝试其他方式
+2025-09-12 00:37:26,822 - AutoBooking - ERROR - ❌ 选择乘客 鞠放 失败: cannot access local variable 'passenger_selected' where it is not associated with a value
+2025-09-12 00:37:26,822 - AutoBooking - ERROR - ❌ 选择乘客 鞠放 失败: cannot access local variable 'passenger_selected' where it is not associated with a value
+2025-09-12 00:37:26,836 - AutoBooking - INFO - 🎉 乘客搜索选择完成
+2025-09-12 00:37:26,836 - AutoBooking - INFO - 🎉 乘客搜索选择完成
+2025-09-12 00:37:26,837 - AutoBooking - INFO - 提交订单...
+2025-09-12 00:37:26,837 - AutoBooking - INFO - 提交订单...
+2025-09-12 00:37:29,431 - AutoBooking - INFO - 订单提交成功
+2025-09-12 00:37:29,431 - AutoBooking - INFO - 订单提交成功
+2025-09-12 00:37:29,433 - AutoBooking - INFO - 确认订单...
+2025-09-12 00:37:29,433 - AutoBooking - INFO - 确认订单...
+2025-09-12 00:37:29,527 - AutoBooking - ERROR - 确认订单失败: Message: element not interactable
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#elementnotinteractableexception
+Stacktrace:
+#0 0x5ce42807b94a <unknown>
+#1 0x5ce427af06f3 <unknown>
+#2 0x5ce427b4374e <unknown>
+#3 0x5ce427b3678b <unknown>
+#4 0x5ce427b68032 <unknown>
+#5 0x5ce427b36107 <unknown>
+#6 0x5ce427b681fe <unknown>
+#7 0x5ce427b8dc23 <unknown>
+#8 0x5ce427b67e03 <unknown>
+#9 0x5ce427b34968 <unknown>
+#10 0x5ce427b355e1 <unknown>
+#11 0x5ce42803f548 <unknown>
+#12 0x5ce428043272 <unknown>
+#13 0x5ce428026313 <unknown>
+#14 0x5ce428043dc5 <unknown>
+#15 0x5ce42800b49f <unknown>
+#16 0x5ce428068158 <unknown>
+#17 0x5ce428068332 <unknown>
+#18 0x5ce42807aa53 <unknown>
+#19 0x725d2d09caa4 <unknown>
+#20 0x725d2d129c3c <unknown>
+
+2025-09-12 00:37:29,527 - AutoBooking - ERROR - 确认订单失败: Message: element not interactable
+  (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#elementnotinteractableexception
+Stacktrace:
+#0 0x5ce42807b94a <unknown>
+#1 0x5ce427af06f3 <unknown>
+#2 0x5ce427b4374e <unknown>
+#3 0x5ce427b3678b <unknown>
+#4 0x5ce427b68032 <unknown>
+#5 0x5ce427b36107 <unknown>
+#6 0x5ce427b681fe <unknown>
+#7 0x5ce427b8dc23 <unknown>
+#8 0x5ce427b67e03 <unknown>
+#9 0x5ce427b34968 <unknown>
+#10 0x5ce427b355e1 <unknown>
+#11 0x5ce42803f548 <unknown>
+#12 0x5ce428043272 <unknown>
+#13 0x5ce428026313 <unknown>
+#14 0x5ce428043dc5 <unknown>
+#15 0x5ce42800b49f <unknown>
+#16 0x5ce428068158 <unknown>
+#17 0x5ce428068332 <unknown>
+#18 0x5ce42807aa53 <unknown>
+#19 0x725d2d09caa4 <unknown>
+#20 0x725d2d129c3c <unknown>
+
+2025-09-12 00:38:12,223 - AutoBooking - INFO - 浏览器已关闭
+2025-09-12 00:38:12,223 - AutoBooking - INFO - 浏览器已关闭

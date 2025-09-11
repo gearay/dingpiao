@@ -547,78 +547,454 @@ class AutoBooking:
             self.status = BookingStatus.SELECTING_SEATS
             self.logger.info("选择乘客和席次...")
             
-            # 等待乘客选择页面加载
-            WebDriverWait(self.driver, self.wait_timeout).until(
-                EC.presence_of_element_located((By.ID, "normal_passenger_id"))
-            )
+            # 等待页面加载完成
+            time.sleep(2)
             
-            passenger_rows = self.driver.find_elements(By.XPATH, "//tbody[@id='normal_passenger_id']/tr")
-            
-            for passenger in passengers:
-                # 查找匹配的乘客
-                passenger_found = False
-                for row in passenger_rows:
-                    try:
-                        name_element = row.find_element(By.XPATH, "./td[1]")
-                        if name_element.text.strip() == passenger.name.strip():
-                            # 选择乘客
-                            checkbox = row.find_element(By.XPATH, "./td[1]/input")
-                            if not checkbox.is_selected():
-                                checkbox.click()
-                            
-                            # 选择席次
-                            seat_select = row.find_element(By.XPATH, "./td[3]/select")
-                            seat_select.click()
-                            
-                            # 查找对应的席次选项
-                            seat_options = seat_select.find_elements(By.TAG_NAME, "option")
-                            seat_selected = False
-                            for option in seat_options:
-                                if passenger.seat_type.value in option.text:
-                                    option.click()
-                                    seat_selected = True
-                                    break
-                            
-                            if not seat_selected:
-                                self.logger.warning(f"未找到席次 {passenger.seat_type.value}，使用默认选项")
-                            
-                            # 如果是卧铺，选择铺位
-                            if passenger.bunk_type and "卧" in passenger.seat_type.value:
-                                try:
-                                    bunk_select = row.find_element(By.XPATH, "./td[4]/select")
-                                    bunk_select.click()
-                                    
-                                    bunk_options = bunk_select.find_elements(By.TAG_NAME, "option")
-                                    bunk_selected = False
-                                    for option in bunk_options:
-                                        if passenger.bunk_type.value in option.text:
-                                            option.click()
-                                            bunk_selected = True
-                                            break
-                                    
-                                    if not bunk_selected:
-                                        self.logger.warning(f"未找到铺位 {passenger.bunk_type.value}")
-                                except Exception as e:
-                                    self.logger.debug(f"铺位选择失败: {e}")
-                            
-                            passenger_found = True
-                            self.logger.info(f"乘客 {passenger.name} 选择成功")
-                            break
-                    
-                    except Exception as e:
-                        self.logger.debug(f"处理乘客行失败: {e}")
-                        continue
+            # 尝试切换到可能包含乘客信息的frame
+            frame_switched = False
+            try:
+                # 策略1: 查找所有iframe并尝试切换
+                iframes = self.driver.find_elements(By.TAG_NAME, "iframe")
+                self.logger.info(f"找到 {len(iframes)} 个iframe")
                 
-                if not passenger_found:
-                    self.logger.warning(f"未找到乘客 {passenger.name}")
+                for i, iframe in enumerate(iframes):
+                    try:
+                        self.driver.switch_to.frame(iframe)
+                        self.logger.info(f"切换到iframe {i+1}")
+                        
+                        # 检查frame中是否有乘客相关内容
+                        try:
+                            passenger_elements = self.driver.find_elements(By.XPATH, "//*[contains(text(), '乘车人') or contains(text(), 'passenger')]")
+                            if passenger_elements:
+                                self.logger.info(f"iframe {i+1} 中找到乘客相关元素")
+                                frame_switched = True
+                                break
+                            else:
+                                self.logger.debug(f"iframe {i+1} 中未找到乘客相关元素")
+                        except:
+                            self.logger.debug(f"iframe {i+1} 检查失败")
+                        
+                        # 如果没有找到，切换回主文档
+                        self.driver.switch_to.default_content()
+                    except Exception as e:
+                        self.logger.debug(f"切换iframe {i+1} 失败: {e}")
+                        try:
+                            self.driver.switch_to.default_content()
+                        except:
+                            pass
+            except Exception as e:
+                self.logger.debug(f"iframe切换过程失败: {e}")
+                try:
+                    self.driver.switch_to.default_content()
+                except:
+                    pass
             
-            self.logger.info("乘客和席次选择完成")
-            return True
+            # 如果没有成功切换到frame，在主文档中查找
+            if not frame_switched:
+                self.logger.info("在主文档中查找乘客信息")
+                self.driver.switch_to.default_content()
+            
+            # 使用搜索框策略选择乘客
+            return self._select_passengers_by_search(passengers)
             
         except Exception as e:
             self.logger.error(f"选择乘客和席次失败: {e}")
             self.error_message = str(e)
             self.status = BookingStatus.FAILED
+            return False
+    
+    def _select_passengers_by_search(self, passengers: List[Passenger]) -> bool:
+        """使用搜索框选择乘客"""
+        try:
+            self.logger.info("开始使用搜索框选择乘客...")
+            self.logger.info(f"需要选择的乘客列表: {[p.name for p in passengers]}")
+            
+            # 等待搜索框加载
+            search_box = None
+            search_button = None
+            try:
+                search_box = WebDriverWait(self.driver, self.wait_timeout).until(
+                    EC.presence_of_element_located((By.ID, "quickQueryPassenger_id"))
+                )
+                self.logger.info("✓ 找到乘客搜索框 (ID: quickQueryPassenger_id)")
+                
+                # 查找搜索按钮
+                search_button = self.driver.find_element(By.ID, "submit_quickQueryPassenger")
+                self.logger.info("✓ 找到搜索按钮 (ID: submit_quickQueryPassenger)")
+                
+                # 调试搜索框属性
+                try:
+                    self.logger.debug(f"搜索框属性: tag={search_box.tag_name}, type={search_box.get_attribute('type')}, value='{search_box.get_attribute('value')}'")
+                except:
+                    pass
+                    
+            except Exception as e:
+                self.logger.warning(f"✗ 未找到乘客搜索框: {e}")
+                self.logger.info("回退到备用选择方法...")
+                # 回退到原来的选择方法
+                return self._select_passengers_fallback(passengers)
+            
+            # 清空搜索框
+            try:
+                search_box.clear()
+                self.logger.info("✓ 清空搜索框")
+            except Exception as e:
+                self.logger.debug(f"清空搜索框失败: {e}")
+            
+            # 记录页面上的所有复选框状态
+            try:
+                all_checkboxes = self.driver.find_elements(By.XPATH, "//input[@type='checkbox']")
+                self.logger.debug(f"搜索前页面上有 {len(all_checkboxes)} 个复选框")
+                for i, cb in enumerate(all_checkboxes[:5]):  # 只显示前5个
+                    try:
+                        self.logger.debug(f"  复选框{i+1}: 显示={cb.is_displayed()}, 选中={cb.is_selected()}, title={cb.get_attribute('title')}")
+                    except:
+                        pass
+            except:
+                pass
+            
+            for passenger in passengers:
+                try:
+                    self.logger.info(f"🔍 开始搜索乘客: {passenger.name}")
+                    
+                    # 先清空搜索框显示所有乘客
+                    search_box.clear()
+                    self.logger.debug("✓ 清空搜索框，准备显示所有乘客")
+                    
+                    # 等待所有乘客加载
+                    time.sleep(0.5)
+                    
+                    # 尝试通过拼音搜索（如果适用）
+                    if len(passenger.name) >= 2:
+                        # 尝试拼音首字母搜索（如"鞠放" -> "jf"）
+                        pinyin_search = passenger.name[0] + passenger.name[1]
+                        self.logger.info(f"尝试拼音首字母搜索: '{pinyin_search}'")
+                        
+                        search_box.send_keys(pinyin_search)
+                        # 点击搜索按钮
+                        if search_button:
+                            search_button.click()
+                            self.logger.info("✓ 点击搜索按钮")
+                        time.sleep(1)
+                        
+                        # 检查是否能找到乘客
+                        if self._try_select_passenger_by_search(passenger, pinyin_search):
+                            self.logger.info(f"✅ 通过拼音搜索成功选中乘客 {passenger.name}")
+                            passenger_selected = True
+                        else:
+                            self.logger.info(f"拼音搜索未找到 {passenger.name}，尝试其他方式")
+                    
+                    # 如果拼音搜索失败，尝试直接搜索
+                    if not passenger_selected:
+                        search_box.clear()
+                        search_box.send_keys(passenger.name)
+                        self.logger.info(f"✓ 在搜索框中输入完整姓名: '{passenger.name}'")
+                        
+                        # 点击搜索按钮
+                        if search_button:
+                            search_button.click()
+                            self.logger.info("✓ 点击搜索按钮")
+                        
+                        # 等待搜索结果
+                        self.logger.debug("等待搜索结果加载...")
+                        time.sleep(1)
+                    
+                    # 记录搜索后的复选框状态
+                    try:
+                        search_checkboxes = self.driver.find_elements(By.XPATH, "//input[@type='checkbox']")
+                        self.logger.debug(f"搜索后页面上有 {len(search_checkboxes)} 个复选框")
+                        for i, cb in enumerate(search_checkboxes[:5]):  # 只显示前5个
+                            try:
+                                self.logger.debug(f"  搜索后复选框{i+1}: 显示={cb.is_displayed()}, 选中={cb.is_selected()}, title={cb.get_attribute('title')}")
+                            except:
+                                pass
+                    except:
+                        pass
+                    
+                    # 尝试多种方式选择搜索到的乘客
+                    passenger_selected = False
+                    
+                    # 尝试选择乘客
+                    if self._try_select_passenger_by_search(passenger, passenger.name):
+                        self.logger.info(f"✅ 通过搜索成功选中乘客 {passenger.name}")
+                        passenger_selected = True
+                    else:
+                        self.logger.info(f"搜索未找到 {passenger.name}，尝试在完整列表中查找")
+                        
+                        # 清空搜索框显示所有乘客
+                        search_box.clear()
+                        if search_button:
+                            search_button.click()
+                        time.sleep(1)
+                        
+                        # 在完整列表中查找
+                        if self._try_select_passenger_in_full_list(passenger):
+                            self.logger.info(f"✅ 在完整列表中成功选中乘客 {passenger.name}")
+                            passenger_selected = True
+                    
+                    passenger_selected = False  # 这个变量已在上面定义
+                    
+                    if not passenger_selected:
+                        self.logger.warning(f"❌ 无法通过搜索选中乘客 {passenger.name}")
+                        # 记录当前页面状态用于调试
+                        try:
+                            page_source = self.driver.page_source
+                            if passenger.name in page_source:
+                                self.logger.info(f"  页面中包含乘客姓名 '{passenger.name}'，但可能结构不匹配")
+                            else:
+                                self.logger.warning(f"  页面中未找到乘客姓名 '{passenger.name}'")
+                        except:
+                            pass
+                    else:
+                        self.logger.info(f"✅ 乘客 {passenger.name} 选择成功")
+                    
+                    # 清空搜索框为下一个乘客做准备
+                    try:
+                        search_box.clear()
+                        self.logger.debug(f"✅ 清空搜索框为下一个乘客做准备")
+                    except Exception as e:
+                        self.logger.debug(f"清空搜索框失败: {e}")
+                        
+                except Exception as e:
+                    self.logger.error(f"❌ 选择乘客 {passenger.name} 失败: {e}")
+                    # 记录异常时的页面状态
+                    try:
+                        self.logger.debug("失败时的页面状态:")
+                        all_checkboxes = self.driver.find_elements(By.XPATH, "//input[@type='checkbox']")
+                        self.logger.debug(f"  当前页面上有 {len(all_checkboxes)} 个复选框")
+                    except:
+                        pass
+                    continue
+            
+            self.logger.info("🎉 乘客搜索选择完成")
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"搜索选择乘客失败: {e}")
+            return self._select_passengers_fallback(passengers)
+    
+    def _try_select_passenger_by_search(self, passenger: Passenger, search_term: str) -> bool:
+        """在搜索结果中尝试选择乘客"""
+        try:
+            self.logger.debug(f"尝试在搜索结果中选择乘客: {passenger.name}, 搜索词: {search_term}")
+            
+            # 策略1: 通过title属性匹配乘客
+            checkbox_patterns = [
+                f"//input[@title='设置为乘车人，按空格键进行操作' and contains(@*, '{passenger.name}')]",
+                f"//input[@title='乘车人' and contains(@*, '{passenger.name}')]",
+                f"//input[@type='checkbox' and contains(@*, '{passenger.name}')]"
+            ]
+            
+            for i, pattern in enumerate(checkbox_patterns):
+                try:
+                    self.logger.debug(f"  模式{i+1}: {pattern}")
+                    checkboxes = self.driver.find_elements(By.XPATH, pattern)
+                    self.logger.debug(f"  模式{i+1}找到 {len(checkboxes)} 个匹配的复选框")
+                    
+                    for j, checkbox in enumerate(checkboxes):
+                        try:
+                            is_displayed = checkbox.is_displayed()
+                            is_selected = checkbox.is_selected()
+                            title = checkbox.get_attribute('title')
+                            self.logger.debug(f"    复选框{j+1}: 显示={is_displayed}, 选中={is_selected}, title='{title}'")
+                            
+                            if is_displayed and not is_selected:
+                                checkbox.click()
+                                self.logger.info(f"✅ 通过复选框选中乘客 {passenger.name} (模式{i+1}-复选框{j+1})")
+                                return True
+                            elif is_displayed and is_selected:
+                                self.logger.info(f"✅ 乘客 {passenger.name} 已被选中 (模式{i+1}-复选框{j+1})")
+                                return True
+                        except Exception as e:
+                            self.logger.debug(f"    点击复选框{j+1}失败: {e}")
+                            continue
+                    
+                except Exception as e:
+                    self.logger.debug(f"  模式{i+1}搜索失败: {e}")
+            
+            # 策略2: 在搜索结果中查找包含乘客姓名的行
+            passenger_rows = self.driver.find_elements(By.XPATH, 
+                "//tbody[@id='normal_passenger_id']/tr | //tbody[@id='dj_passenger_id']/tr | //table//tr[.//input[@type='checkbox']]")
+            
+            for i, row in enumerate(passenger_rows):
+                try:
+                    row_text = row.text
+                    if passenger.name in row_text:
+                        self.logger.debug(f"  在行{i+1}中找到乘客 {passenger.name}: '{row_text[:50]}...'")
+                        
+                        # 尝试点击该行的复选框
+                        checkbox = row.find_element(By.XPATH, ".//input[@type='checkbox']")
+                        if checkbox.is_displayed() and not checkbox.is_selected():
+                            checkbox.click()
+                            self.logger.info(f"✅ 通过行匹配选中乘客 {passenger.name} (行{i+1})")
+                            return True
+                        elif checkbox.is_displayed() and checkbox.is_selected():
+                            self.logger.info(f"✅ 乘客 {passenger.name} 已被选中 (行{i+1})")
+                            return True
+                except Exception as e:
+                    self.logger.debug(f"    处理行{i+1}失败: {e}")
+                    continue
+            
+            return False
+            
+        except Exception as e:
+            self.logger.debug(f"搜索选择乘客失败: {e}")
+            return False
+    
+    def _try_select_passenger_in_full_list(self, passenger: Passenger) -> bool:
+        """在完整乘客列表中选择乘客"""
+        try:
+            self.logger.debug(f"尝试在完整乘客列表中选择: {passenger.name}")
+            
+            # 查找所有显示的乘客列表
+            try:
+                # 查找乘车人列表
+                normal_passengers = self.driver.find_elements(By.XPATH, "//ul[@id='normal_passenger_id']//li")
+                dj_passengers = self.driver.find_elements(By.XPATH, "//ul[@id='dj_passenger_id']//li")
+                
+                self.logger.debug(f"找到 {len(normal_passengers)} 个乘车人，{len(dj_passengers)} 个受让人")
+                
+                # 检查乘车人列表
+                for i, li in enumerate(normal_passengers):
+                    try:
+                        if passenger.name in li.text:
+                            self.logger.debug(f"  在乘车人列表{i+1}中找到: '{li.text[:50]}...'")
+                            
+                            # 查找该li元素中的复选框
+                            checkbox = li.find_element(By.XPATH, ".//input[@type='checkbox']")
+                            if checkbox.is_displayed() and not checkbox.is_selected():
+                                checkbox.click()
+                                self.logger.info(f"✅ 在乘车人列表中选中 {passenger.name} (列表项{i+1})")
+                                return True
+                            elif checkbox.is_displayed() and checkbox.is_selected():
+                                self.logger.info(f"✅ 乘客 {passenger.name} 已被选中 (乘车人列表项{i+1})")
+                                return True
+                    except Exception as e:
+                        self.logger.debug(f"    处理乘车人列表项{i+1}失败: {e}")
+                        continue
+                
+                # 检查受让人列表
+                for i, li in enumerate(dj_passengers):
+                    try:
+                        if passenger.name in li.text:
+                            self.logger.debug(f"  在受让人列表{i+1}中找到: '{li.text[:50]}...'")
+                            
+                            # 查找该li元素中的复选框
+                            checkbox = li.find_element(By.XPATH, ".//input[@type='checkbox']")
+                            if checkbox.is_displayed() and not checkbox.is_selected():
+                                checkbox.click()
+                                self.logger.info(f"✅ 在受让人列表中选中 {passenger.name} (列表项{i+1})")
+                                return True
+                            elif checkbox.is_displayed() and checkbox.is_selected():
+                                self.logger.info(f"✅ 乘客 {passenger.name} 已被选中 (受让人列表项{i+1})")
+                                return True
+                    except Exception as e:
+                        self.logger.debug(f"    处理受让人列表项{i+1}失败: {e}")
+                        continue
+                        
+            except Exception as e:
+                self.logger.debug(f"查找乘客列表失败: {e}")
+            
+            # 策略3: 通过JavaScript在完整列表中查找
+            js_script = f"""
+                var allLis = document.querySelectorAll('#normal_passenger_id li, #dj_passenger_id li');
+                for (var i = 0; i < allLis.length; i++) {{
+                    var li = allLis[i];
+                    if (li.textContent && li.textContent.includes('{passenger.name}')) {{
+                        console.log('在列表项中找到乘客:', i, li.textContent.substring(0, 50));
+                        var checkbox = li.querySelector('input[type="checkbox"]');
+                        if (checkbox && !checkbox.checked) {{
+                            checkbox.click();
+                            console.log('已点击复选框');
+                        }}
+                        return true;
+                    }}
+                }}
+                console.log('在完整列表中未找到乘客');
+                return false;
+            """
+            
+            result = self.driver.execute_script(js_script)
+            if result:
+                self.logger.info(f"✅ 通过JavaScript在完整列表中选中乘客 {passenger.name}")
+                return True
+            
+            return False
+            
+        except Exception as e:
+            self.logger.debug(f"在完整列表中选择乘客失败: {e}")
+            return False
+    
+    def _select_passengers_fallback(self, passengers: List[Passenger]) -> bool:
+        """备用乘客选择方法"""
+        try:
+            self.logger.info("使用备用方法选择乘客...")
+            
+            # 尝试多种方式定位乘客区域
+            passenger_found = False
+            location_strategies = [
+                # 策略1: 通过ID
+                lambda: self.driver.find_element(By.ID, "normal_passenger_id"),
+                # 策略2: 通过包含"乘车人"文本的元素
+                lambda: self.driver.find_element(By.XPATH, "//*[contains(text(), '乘车人')]"),
+                # 策略3: 通过title属性
+                lambda: self.driver.find_element(By.XPATH, '//input[@title="乘车人"]'),
+                # 策略4: 通过复选框
+                lambda: self.driver.find_element(By.XPATH, '//input[@type="checkbox"]'),
+            ]
+            
+            passenger_container = None
+            for i, strategy in enumerate(location_strategies):
+                try:
+                    passenger_container = strategy()
+                    self.logger.info(f"备用策略{i+1}成功找到乘客容器")
+                    passenger_found = True
+                    break
+                except Exception as e:
+                    self.logger.debug(f"备用策略{i+1}失败: {e}")
+            
+            if not passenger_found:
+                self.logger.error("备用方法也未找到乘客选择区域")
+                return False
+            
+            # 查找乘客行并选择
+            passenger_rows = []
+            try:
+                passenger_rows = self.driver.find_elements(By.XPATH, "//tbody[@id='normal_passenger_id']/tr")
+                self.logger.info(f"通过normal_passenger_id找到 {len(passenger_rows)} 个乘客行")
+            except:
+                self.logger.debug("normal_passenger_id定位失败")
+            
+            if not passenger_rows:
+                try:
+                    passenger_rows = self.driver.find_elements(By.XPATH, "//table//tr[.//input[@type='checkbox']]")
+                    self.logger.info(f"通过复选框找到 {len(passenger_rows)} 个乘客行")
+                except:
+                    pass
+            
+            for passenger in passengers:
+                passenger_found = False
+                for row in passenger_rows:
+                    try:
+                        row_text = row.text
+                        if passenger.name in row_text:
+                            # 尝试选择乘客
+                            checkbox = row.find_element(By.XPATH, ".//input[@type='checkbox']")
+                            if not checkbox.is_selected():
+                                checkbox.click()
+                                self.logger.info(f"备用方法选中乘客 {passenger.name}")
+                            passenger_found = True
+                            break
+                    except:
+                        continue
+                
+                if not passenger_found:
+                    self.logger.warning(f"备用方法未找到乘客 {passenger.name}")
+            
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"备用乘客选择失败: {e}")
             return False
     
     def submit_order(self) -> bool:

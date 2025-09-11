@@ -1,0 +1,82 @@
+[
+  {
+    "train_info": {
+      "train_number": "D3",
+      "departure_station": "北京西",
+      "arrival_station": "荆州",
+      "departure_time": "18:05",
+      "arrival_time": "08:56",
+      "duration": "",
+      "date": "2025-10-03"
+    },
+    "passengers": [
+      {
+        "name": "陈岩",
+        "id_type": "二代身份证",
+        "id_number": "110102197907070011",
+        "mobile": "13811721852",
+        "email": "chen.gary@qq.com",
+        "ticket_type": "成人票",
+        "passenger_type": "成人",
+        "seat_type": "软卧",
+        "bunk_type": "上铺"
+      },
+      {
+        "name": "鞠放",
+        "id_type": "二代身份证",
+        "id_number": "230102198307060460",
+        "mobile": "18610083763",
+        "email": "juyang2692@sina.com",
+        "ticket_type": "成人票",
+        "passenger_type": "成人",
+        "seat_type": "软卧",
+        "bunk_type": "下铺"
+      },
+      {
+        "name": "陈希言",
+        "id_type": "二代身份证",
+        "id_number": "110108201803146381",
+        "mobile": "15795487863",
+        "email": "",
+        "ticket_type": "成人票",
+        "passenger_type": "成人",
+        "seat_type": "二等座"
+      }
+    ]
+  },
+  {
+    "train_info": {
+      "train_number": "D3",
+      "departure_station": "北京西",
+      "arrival_station": "涪陵北",
+      "departure_time": "",
+      "arrival_time": "",
+      "duration": "",
+      "date": "2025-09-25"
+    },
+    "passengers": [
+      {
+        "name": "陈岩",
+        "id_type": "二代身份证",
+        "id_number": "110102197907070011",
+        "mobile": "13811721852",
+        "email": "chen.gary@qq.com",
+        "ticket_type": "成人票",
+        "passenger_type": "成人",
+        "seat_type": "软卧",
+        "bunk_type": "上铺"
+      },
+      {
+        "name": "鞠放",
+        "id_type": "二代身份证",
+        "id_number": "230102198307060460",
+        "mobile": "18610083763",
+        "email": "juyang2692@sina.com",
+        "ticket_type": "成人票",
+        "passenger_type": "成人",
+        "seat_type": "软卧",
+        "bunk_type": "下铺"
+      }
+    ]
+  }
+]

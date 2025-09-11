@@ -1,0 +1,34 @@
+[
+  {
+    "name": "陈岩",
+    "id_type": "二代身份证",
+    "id_number": "110102197907070011",
+    "mobile": "13811721852",
+    "email": "chen.gary@qq.com",
+    "ticket_type": "成人票",
+    "passenger_type": "成人",
+    "seat_type": "软卧",
+    "bunk_type": "上铺"
+  },
+  {
+    "name": "鞠放",
+    "id_type": "二代身份证",
+    "id_number": "230102198307060460",
+    "mobile": "18610083763",
+    "email": "juyang2692@sina.com",
+    "ticket_type": "成人票",
+    "passenger_type": "成人",
+    "seat_type": "软卧",
+    "bunk_type": "下铺"
+  },
+  {
+    "name": "陈希言",
+    "id_type": "二代身份证",
+    "id_number": "110108201803146381",
+    "mobile": "15795487863",
+    "email": "",
+    "ticket_type": "成人票",
+    "passenger_type": "成人",
+    "seat_type": "二等座"
+  }
+]

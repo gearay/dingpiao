@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "12306"
+version = "0.1.0"
+description = "12306自动购票系统 - 基于Python的铁路票务自动预订工具"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "12306 Booking System", email = "booking@example.com"}
+]
+keywords = ["12306", "train", "ticket", "booking", "automation"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "selenium>=4.15.0",
+    "webdriver-manager>=4.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/example/12306-booking"
+Repository = "https://github.com/example/12306-booking.git"
+Issues = "https://github.com/example/12306-booking/issues"
+
+[project.scripts]
+12306-booking = "main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*.py"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.md"]
+
+[tool.uv.workspace]
+members = [
+    "python3.11",
+]

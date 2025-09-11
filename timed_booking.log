@@ -1,0 +1,18 @@
+2025-09-11 15:36:28,607 - TimedBooking - INFO - 添加预订任务: D3 at 2025-09-18 08:00:01
+2025-09-11 15:36:34,178 - TimedBooking - INFO - 调度器已启动
+2025-09-11 15:37:07,961 - TimedBooking - INFO - 开始预登录
+2025-09-11 15:37:08,104 - TimedBooking - ERROR - 预登录失败
+2025-09-11 15:37:17,650 - TimedBooking - INFO - 调度器已停止
+2025-09-11 16:58:38,713 - TimedBooking - INFO - 调度器已启动
+2025-09-11 16:58:47,715 - TimedBooking - INFO - 调度器已停止
+2025-09-11 16:59:24,658 - TimedBooking - INFO - 添加预订任务: D3 at 2025-09-11 17:00:00
+2025-09-11 16:59:26,947 - TimedBooking - INFO - 调度器已启动
+2025-09-11 16:59:31,251 - TimedBooking - WARNING - 调度器已在运行
+2025-09-11 17:00:00,232 - TimedBooking - INFO - 执行任务 (第1次): D3
+2025-09-11 17:00:00,233 - TimedBooking - INFO - 启动任务: D3
+2025-09-11 17:01:11,159 - TimedBooking - WARNING - 任务重试中: 1/3
+2025-09-11 17:01:13,666 - TimedBooking - INFO - 执行任务 (第2次): D3
+2025-09-11 17:01:34,678 - TimedBooking - WARNING - 任务重试中: 2/3
+2025-09-11 17:01:39,681 - TimedBooking - INFO - 执行任务 (第3次): D3
+2025-09-11 17:01:59,874 - TimedBooking - ERROR - 任务失败: D3
+2025-09-11 17:04:36,915 - TimedBooking - INFO - 调度器已停止

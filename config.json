@@ -1,0 +1,8 @@
+{
+  "username": "gearay",
+  "password": "f16ak47",
+  "max_retries": 3,
+  "retry_delay": 5,
+  "headless": false,
+  "auto_save": true
+}

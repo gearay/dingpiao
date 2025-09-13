@@ -229,11 +229,11 @@ class TimedBooking:
                 self._cleanup_tasks()
                 
                 # 精确控制循环间隔（毫秒级）
-                time.sleep(0.1)  # 100ms检查间隔，确保时间精确
+                time.sleep(0.01)  # 10ms检查间隔，确保时间精确
                 
             except Exception as e:
                 self.logger.error(f"工作线程异常: {e}")
-                time.sleep(5)
+                time.sleep(0.1)  # 100ms for faster operation
     
     def _start_task(self, task: BookingTask) -> None:
         """启动任务"""
@@ -282,7 +282,7 @@ class TimedBooking:
                                 self.error_callback(task)
                         else:
                             self.logger.warning(f"任务重试中: {task.retry_count}/{task.max_retries}")
-                            time.sleep(5)
+                            time.sleep(0.1)  # 100ms for faster operation
                 
                 except Exception as e:
                     task.error_message = str(e)
@@ -294,7 +294,7 @@ class TimedBooking:
                         if self.error_callback:
                             self.error_callback(task)
                     else:
-                        time.sleep(5)
+                        time.sleep(0.1)  # 100ms for faster operation
         
         except Exception as e:
             task.status = "failed"
@@ -371,7 +371,7 @@ class TimedBooking:
                                     self.logger.debug("预搜索阶段：刷新查询成功")
                                 except:
                                     self.logger.debug("预搜索阶段：刷新查询失败")
-                            time.sleep(10)
+                            time.sleep(0.1)  # 100ms for faster operation
                         elif time_remaining > 60:  # 1-2分钟，每15秒刷新
                             self.logger.debug(f"即将开始预订，还有 {int(time_remaining)} 秒")
                             if time_remaining % 15 < 1:  # 每15秒刷新
@@ -380,7 +380,7 @@ class TimedBooking:
                                     self.logger.debug("预搜索阶段：高频刷新查询成功")
                                 except:
                                     self.logger.debug("预搜索阶段：高频刷新查询失败")
-                            time.sleep(5)
+                            time.sleep(0.1)  # 100ms for faster operation
                         elif time_remaining > 10:  # 10-60秒，每5秒刷新
                             self.logger.debug(f"即将开始预订，还有 {int(time_remaining)} 秒")
                             if time_remaining % 5 < 1:  # 每5秒刷新
@@ -389,23 +389,23 @@ class TimedBooking:
                                     self.logger.debug("预搜索阶段：超高频刷新查询成功")
                                 except:
                                     self.logger.debug("预搜索阶段：超高频刷新查询失败")
-                            time.sleep(1)
+                            time.sleep(0.05)  # 50ms for faster operation
                         else:  # 最后10秒，准备精确点击
                             self.logger.info(f"最后倒计时：{int(time_remaining * 1000)} 毫秒")
                             if time_remaining > 3:  # 3-10秒，每2秒刷新
-                                time.sleep(2)
+                                time.sleep(0.05)  # 50ms for faster operation
                                 try:
                                     self.auto_booking.search_tickets()
                                 except:
                                     pass
                             else:  # 最后3秒，精确等待
-                                time.sleep(0.1)  # 100ms检查间隔
+                                time.sleep(0.01)  # 10ms检查间隔
                         
                         current_time = datetime.now()
                         
                     except Exception as e:
                         self.logger.warning(f"预搜索阶段监控异常: {e}")
-                        time.sleep(1)
+                        time.sleep(0.05)  # 50ms for faster operation
             
             # 阶段2: 精确时间点开始预订
             if task.status != "searching":

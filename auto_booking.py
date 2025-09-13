@@ -37,8 +37,8 @@ class AutoBooking:
         self.base_url = "https://www.12306.cn"
         self.ticket_url = "https://kyfw.12306.cn/otn/leftTicket/init"
         self.wait_timeout = 30
-        self.poll_interval = 0.5
-        self.login_check_interval = 2
+        self.poll_interval = 0.05  # 50ms for faster polling
+        self.login_check_interval = 0.1  # 100ms for faster login checking
         self.max_login_wait_time = 300
 
     def _setup_logger(self) -> logging.Logger:
@@ -84,9 +84,9 @@ class AutoBooking:
                 return False
 
             self.driver.get(self.base_url)
-            time.sleep(1.5)
+            time.sleep(0.05)  # 50ms for page load
             self.driver.get(self.ticket_url)
-            time.sleep(1.0)
+            time.sleep(0.05)  # 50ms for page load
 
             # 移除车次查询表单填充，只打开登录页面
             print("=" * 50)
@@ -117,62 +117,62 @@ class AutoBooking:
             # 出发地
             from_input = wait.until(EC.element_to_be_clickable((By.ID, "fromStationText")))
             from_input.click()
-            time.sleep(0.3)
+            time.sleep(0.02)  # 20ms for click response
             
             # 确保清空输入框
             from_input.clear()
-            time.sleep(0.2)
+            time.sleep(0.01)  # 10ms for clear operation
             
             # 再次清空以确保完全清空
             current_value = from_input.get_attribute('value')
             if current_value:
                 from_input.clear()
-                time.sleep(0.2)
+                time.sleep(0.01)  # 10ms for additional clear
                 
             from_input.send_keys(from_station)
-            time.sleep(0.3)
+            time.sleep(0.02)  # 20ms for key input
             
             # 关闭下拉
             from_input.send_keys(Keys.ENTER)
-            time.sleep(0.3)
+            time.sleep(0.02)  # 20ms for dropdown close
 
             # 目的地
             to_input = wait.until(EC.element_to_be_clickable((By.ID, "toStationText")))
             to_input.click()
-            time.sleep(0.3)
+            time.sleep(0.02)  # 20ms for click response
             
             # 确保清空输入框
             to_input.clear()
-            time.sleep(0.2)
+            time.sleep(0.01)  # 10ms for clear operation
             
             # 再次清空以确保完全清空
             current_value = to_input.get_attribute('value')
             if current_value:
                 to_input.clear()
-                time.sleep(0.2)
+                time.sleep(0.01)  # 10ms for additional clear
                 
             to_input.send_keys(to_station)
-            time.sleep(0.3)
+            time.sleep(0.02)  # 20ms for key input
             to_input.send_keys(Keys.ENTER)
-            time.sleep(0.3)
+            time.sleep(0.02)  # 20ms for dropdown close
 
             # 日期
             date_input = wait.until(EC.element_to_be_clickable((By.ID, "train_date")))
             date_input.click()
-            time.sleep(0.3)
+            time.sleep(0.02)  # 20ms for click response
             
             # 确保清空输入框
             date_input.clear()
-            time.sleep(0.2)
+            time.sleep(0.01)  # 10ms for clear operation
             
             # 再次清空以确保完全清空
             current_value = date_input.get_attribute('value')
             if current_value:
                 date_input.clear()
-                time.sleep(0.2)
+                time.sleep(0.01)  # 10ms for additional clear
                 
             date_input.send_keys(departure_date)
-            time.sleep(0.3)
+            time.sleep(0.02)  # 20ms for key input
             
             self.logger.info("搜索表单填充完成")
         except Exception as e:
@@ -201,16 +201,16 @@ class AutoBooking:
                 try:
                     query_button = wait.until(EC.element_to_be_clickable((By.ID, "query_ticket")))
                     query_button.click()
-                    time.sleep(1.0)
+                    time.sleep(0.05)  # 50ms for search response
                     # 检查查询结果
                     rows = self.driver.find_elements(By.XPATH, "//tbody[@id='queryLeftTable']/tr[not(contains(@class,'tips'))]")
                     if rows:
                         self.logger.info("车票搜索成功")
                         return True
-                    time.sleep(2.0)
+                    time.sleep(0.1)  # 100ms retry interval
                 except Exception as e:
                     self.logger.warning(f"第 {attempt+1} 次搜索异常: {e}")
-                    time.sleep(2.0)
+                    time.sleep(0.1)  # 100ms retry interval
             return False
         except Exception as e:
             self.logger.error(f"搜索车票失败: {e}")
@@ -221,7 +221,7 @@ class AutoBooking:
     def select_train(self, train_number: str) -> bool:
         try:
             self.status = BookingStatus.SELECTING_TRAIN
-            time.sleep(1.0)
+            time.sleep(0.05)  # 50ms for page stabilization
             rows = self.driver.find_elements(By.XPATH, "//tbody[@id='queryLeftTable']/tr")
             for row in rows:
                 try:
@@ -282,7 +282,7 @@ class AutoBooking:
                     EC.presence_of_element_located((By.XPATH, "//*[contains(text(),'选座喽') or contains(text(),'选铺喽')]"))
                 )
             )
-            time.sleep(0.5)
+            time.sleep(0.05)  # 50ms for faster operation
             return True
         except TimeoutException:
             return False
@@ -306,7 +306,7 @@ class AutoBooking:
             
             # 乘车人选择完成后，再次检查确认弹出框
             self._handle_passenger_selection_dialogs(wait)
-            time.sleep(0.5)
+            time.sleep(0.05)  # 50ms for faster operation
             
             # 设置席别/票种 - 传入完整的TicketInfo以获取席位信息
             if not self._assign_seat_and_ticket(ticket_info, wait):
@@ -314,18 +314,18 @@ class AutoBooking:
             
             # 席别设置后检查确认弹出框
             self._handle_confirmation_dialog(wait)
-            time.sleep(0.3)
+            time.sleep(0.03)  # 30ms for faster operation
             
             # 选座/选铺 - 使用TicketPassenger对象
             for ticket_passenger in ticket_info.ticket_passengers:
                 self._pick_seat_position_for_passenger(ticket_passenger, wait)
                 # 每次选座后检查确认弹出框
                 self._handle_confirmation_dialog(wait)
-                time.sleep(0.3)
+                time.sleep(0.03)  # 30ms for faster operation
             
             # 最终检查是否还有未处理的确认弹出框
             self._handle_confirmation_dialog(wait)
-            time.sleep(0.5)
+            time.sleep(0.05)  # 50ms for faster operation
             
             self.logger.info("乘客与席别选择完成")
             return True
@@ -341,7 +341,7 @@ class AutoBooking:
             wait = WebDriverWait(self.driver, self.wait_timeout)
             btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[normalize-space(text())='提交订单']")))
             self._safe_click(btn)
-            time.sleep(1.5)
+            time.sleep(0.1)  # 100ms for faster operation
             return True
         except Exception as e:
             self.logger.error(f"提交订单失败: {e}")
@@ -355,7 +355,7 @@ class AutoBooking:
             wait = WebDriverWait(self.driver, self.wait_timeout)
             btn = wait.until(EC.element_to_be_clickable((By.ID, "qr_submit_id")))
             self._safe_click(btn)
-            time.sleep(2.0)
+            time.sleep(0.1)  # 100ms for order confirmation
             self.status = BookingStatus.SUCCESS
             return True
         except Exception as e:
@@ -487,7 +487,7 @@ class AutoBooking:
                             try:
                                 element.click()
                                 self.logger.info(f"成功点击确认按钮: {pattern}")
-                                time.sleep(0.8)  # 等待弹窗关闭
+                                time.sleep(0.05)  # 50ms for popup close
                                 return True
                             except Exception as e:
                                 self.logger.debug(f"点击按钮失败 {pattern}: {e}")
@@ -513,7 +513,7 @@ class AutoBooking:
                 body = self.driver.find_element(By.TAG_NAME, "body")
                 body.send_keys(Keys.ENTER)
                 self.logger.info("尝试通过Enter键确认")
-                time.sleep(0.5)
+                time.sleep(0.05)  # 50ms for keyboard confirmation
                 return True
             except Exception:
                 pass
@@ -560,7 +560,7 @@ class AutoBooking:
                                         if button.is_displayed() and button.is_enabled():
                                             button.click()
                                             self.logger.info("成功确认儿童购票弹窗")
-                                            time.sleep(1.0)  # 等待弹窗关闭
+                                            time.sleep(0.05)  # 50ms for popup close
                                             return True
                                 except Exception:
                                     continue
@@ -570,7 +570,7 @@ class AutoBooking:
                                 body = self.driver.find_element(By.TAG_NAME, "body")
                                 body.send_keys(Keys.ENTER)
                                 self.logger.info("通过Enter键确认儿童购票弹窗")
-                                time.sleep(0.5)
+                                time.sleep(0.05)  # 50ms for keyboard confirmation
                                 return True
                             except Exception:
                                 pass
@@ -843,7 +843,7 @@ class AutoBooking:
             # 尝试按Enter键确认
             body = self.driver.find_element(By.TAG_NAME, "body")
             body.send_keys(Keys.ENTER)
-            time.sleep(0.3)
+            time.sleep(0.03)  # 30ms for faster operation
             return True
         except Exception:
             try:
@@ -851,7 +851,7 @@ class AutoBooking:
                 from selenium.webdriver.common.keys import Keys
                 body = self.driver.find_element(By.TAG_NAME, "body")
                 body.send_keys(Keys.ESCAPE)
-                time.sleep(0.3)
+                time.sleep(0.03)  # 30ms for faster operation
                 return True
             except Exception:
                 return False
@@ -940,7 +940,7 @@ class AutoBooking:
                                     self._scroll_into_view(button)
                                     self._safe_click(button)
                                     self.logger.info(f"成功确认{dialog_type['name']}弹窗")
-                                    time.sleep(0.8)
+                                    time.sleep(0.08)  # 80ms for faster operation
                                     return True
                         except Exception:
                             continue
@@ -950,7 +950,7 @@ class AutoBooking:
                         from selenium.webdriver.common.keys import Keys
                         body = self.driver.find_element(By.TAG_NAME, "body")
                         body.send_keys(Keys.ENTER)
-                        time.sleep(0.5)
+                        time.sleep(0.05)  # 50ms for faster operation
                         return True
                     except Exception:
                         continue
@@ -996,7 +996,7 @@ class AutoBooking:
             more_btn = self.driver.find_element(By.XPATH, "//*[contains(normalize-space(text()),'更多')]")
             if more_btn.is_displayed():
                 self._safe_click(more_btn)
-                time.sleep(0.3)
+                time.sleep(0.03)  # 30ms for faster operation
                 # 点击后检查是否有弹出框
                 self._check_and_handle_any_dialog(wait)
         except Exception:
@@ -1027,7 +1027,7 @@ class AutoBooking:
                             self._scroll_into_view(li)
                             if not checkbox.is_selected():
                                 self._safe_click(checkbox)
-                                time.sleep(0.2)
+                                time.sleep(0.02)  # 20ms for faster operation
                                 # 点击复选框后检查是否有确认弹出框
                                 self._handle_passenger_selection_dialogs(wait)
                             found = True
@@ -1043,7 +1043,7 @@ class AutoBooking:
         # 所有乘客选择完成后，检查是否有最终确认弹出框
         if selected_any:
             self._handle_passenger_selection_dialogs(wait)
-            time.sleep(0.5)
+            time.sleep(0.05)  # 50ms for faster operation
         
         return selected_any
 
@@ -1074,7 +1074,7 @@ class AutoBooking:
                         self._safe_click(search_btn)
                         # 点击搜索按钮后检查弹出框
                         self._handle_passenger_selection_dialogs(wait)
-                    time.sleep(0.8)
+                    time.sleep(0.08)  # 80ms for faster operation
                     
                     # 在搜索结果中勾选
                     patterns = [
@@ -1115,7 +1115,7 @@ class AutoBooking:
             # 所有乘客搜索选择完成后，检查是否有最终确认弹出框
             if selected_any:
                 self._handle_passenger_selection_dialogs(wait)
-                time.sleep(0.5)
+                time.sleep(0.05)  # 50ms for faster operation
             
             return selected_any
         except TimeoutException:
@@ -1153,7 +1153,7 @@ class AutoBooking:
             if table:
                 break
             
-            time.sleep(0.5)
+            time.sleep(0.05)  # 50ms for faster operation
         
         if not table:
             self.logger.warning("未能定位乘客信息表格，尝试直接在整页内按姓名找行")
@@ -1174,7 +1174,7 @@ class AutoBooking:
             else:
                 # 每个乘客席别设置成功后检查确认弹出框
                 self._handle_confirmation_dialog(wait)
-                time.sleep(0.3)
+                time.sleep(0.03)  # 30ms for faster operation
         
         return success
 
@@ -1275,7 +1275,7 @@ class AutoBooking:
                 return False
         
         self._scroll_into_view(row)
-        time.sleep(0.3)
+        time.sleep(0.03)  # 30ms for faster operation
         
         # 设置票种和席别 - 使用TicketPassenger对象的信息
         ticket_ok = True
@@ -1339,7 +1339,7 @@ class AutoBooking:
             return False
         
         self._scroll_into_view(row)
-        time.sleep(0.3)
+        time.sleep(0.03)  # 30ms for faster operation
         
         # 设置票种和席别
         ticket_ok = True
@@ -1389,7 +1389,7 @@ class AutoBooking:
                     try:
                         Select(seat_select).select_by_visible_text(match)
                         self.logger.info(f"席次选择成功(表格内): {ticket_passenger.passenger.name} -> {match}")
-                        time.sleep(0.3)
+                        time.sleep(0.03)  # 30ms for faster operation
                         return True
                     except Exception as select_e:
                         self.logger.warning(f"席次选择操作失败: {select_e}")
@@ -1421,7 +1421,7 @@ class AutoBooking:
                             try:
                                 Select(sel).select_by_visible_text(match)
                                 self.logger.info(f"席次选择成功(备选框{i+1}): {ticket_passenger.passenger.name} -> {match}")
-                                time.sleep(0.3)
+                                time.sleep(0.03)  # 30ms for faster operation
                                 return True
                             except Exception as select_e:
                                 self.logger.warning(f"备选席次选择操作失败: {select_e}")
@@ -1451,7 +1451,7 @@ class AutoBooking:
                             try:
                                 Select(sel).select_by_visible_text(match)
                                 self.logger.info(f"席次选择成功(表格范围): {ticket_passenger.passenger.name} -> {match}")
-                                time.sleep(0.3)
+                                time.sleep(0.03)  # 30ms for faster operation
                                 return True
                             except Exception as select_e:
                                 self.logger.warning(f"表格范围席次选择失败: {select_e}")
@@ -1493,7 +1493,7 @@ class AutoBooking:
                     if btn.is_displayed() and btn.is_enabled():
                         self._safe_click(btn)
                         self.logger.info(f"席次选择成功(弹窗): {ticket_passenger.passenger.name} -> {t}")
-                        time.sleep(0.3)
+                        time.sleep(0.03)  # 30ms for faster operation
                         
                         # 如果需要铺位选择
                         if hasattr(ticket_passenger, "bunk_type") and ticket_passenger.bunk_type:
@@ -1530,7 +1530,7 @@ class AutoBooking:
                     if btn.is_displayed() and btn.is_enabled():
                         self._safe_click(btn)
                         self.logger.info(f"铺位选择成功(弹窗): {ticket_passenger.passenger.name} -> {candidate}")
-                        time.sleep(0.3)
+                        time.sleep(0.03)  # 30ms for faster operation
                         return True
                 except Exception:
                     continue
@@ -1615,7 +1615,7 @@ class AutoBooking:
                 try:
                     opt = panel.find_element(By.XPATH, f".//li//*[normalize-space(text())='{t}']")
                     self._safe_click(opt)
-                    time.sleep(0.2)
+                    time.sleep(0.02)  # 20ms for faster operation
                     self.logger.info(f"乘客 {ticket_passenger.passenger.name}: el-select票种设置为 {t}")
                     return True
                 except NoSuchElementException:
@@ -1623,7 +1623,7 @@ class AutoBooking:
                     try:
                         opt = panel.find_element(By.XPATH, f".//li//*[normalize-space(text())='{t_alt}']")
                         self._safe_click(opt)
-                        time.sleep(0.2)
+                        time.sleep(0.02)  # 20ms for faster operation
                         self.logger.info(f"乘客 {ticket_passenger.passenger.name}: el-select票种设置为 {t_alt}")
                         return True
                     except NoSuchElementException:
@@ -1643,13 +1643,13 @@ class AutoBooking:
             for t in t_texts:
                 if t in all_opts:
                     Select(select_element).select_by_visible_text(t)
-                    time.sleep(0.2)
+                    time.sleep(0.02)  # 20ms for faster operation
                     return True
                 # 兼容不带"票"的文本
                 t_alt = t[:-1] if t.endswith("票") else t + "票"
                 if t_alt in all_opts:
                     Select(select_element).select_by_visible_text(t_alt)
-                    time.sleep(0.2)
+                    time.sleep(0.02)  # 20ms for faster operation
                     return True
         except Exception as e:
             self.logger.debug(f"选择票种选项失败: {e}")

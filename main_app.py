@@ -291,6 +291,39 @@ class MainApp:
                 if email:
                     passenger.email = email
                 
+                # 编辑席次
+                print("选择新的席次类型:")
+                seat_types = self.ticket_manager.get_available_seat_types()
+                for i, seat_type in enumerate(seat_types, 1):
+                    print(f"{i}. {seat_type.value}")
+                    if seat_type == passenger.seat_type:
+                        print(f"   (当前选择)")
+                
+                try:
+                    seat_choice = int(input(f"请选择席次 (1-{len(seat_types)}, 当前为{passenger.seat_type.value}): "))
+                    if 1 <= seat_choice <= len(seat_types):
+                        passenger.seat_type = seat_types[seat_choice - 1]
+                except:
+                    print("无效选择，保持原席次")
+                
+                # 如果是卧铺，编辑铺位
+                if "卧" in passenger.seat_type.value:
+                    print("选择铺位类型:")
+                    bunk_types = self.ticket_manager.get_available_bunk_types()
+                    for i, bunk in enumerate(bunk_types, 1):
+                        print(f"{i}. {bunk.value}")
+                        if bunk == passenger.bunk_type:
+                            print(f"   (当前选择)")
+                    
+                    try:
+                        bunk_choice = int(input(f"请选择铺位 (1-{len(bunk_types)}, 当前为{passenger.bunk_type.value if passenger.bunk_type else '无'}): "))
+                        if 1 <= bunk_choice <= len(bunk_types):
+                            passenger.bunk_type = bunk_types[bunk_choice - 1]
+                    except:
+                        print("无效选择，保持原铺位")
+                else:
+                    passenger.bunk_type = None
+                
                 if self.ticket_manager.update_passenger(index, passenger):
                     print("乘客信息更新成功")
                 else:

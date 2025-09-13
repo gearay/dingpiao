@@ -1,23 +1,20 @@
 import time
 import logging
-from datetime import datetime, timedelta
-from typing import Optional, List, Dict, Any, Callable
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.common.exceptions import TimeoutException, NoSuchElementException, WebDriverException
-
-from models import Passenger, TrainInfo, TicketInfo, SeatType, BunkType
-from ticket_manager import TicketManager
+from datetime import datetime
+from typing import Optional, List, Dict, Any
 from enum import Enum
 
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait, Select
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
+
+from models import Passenger, TrainInfo, TicketInfo, SeatType, BunkType
 
 class BookingStatus(Enum):
-    """购票状态枚举"""
     PENDING = "待处理"
     WAITING_FOR_LOGIN = "等待登录"
     SEARCHING = "正在搜索"
@@ -29,1088 +26,1123 @@ class BookingStatus(Enum):
     FAILED = "失败"
     CANCELLED = "已取消"
 
-
 class AutoBooking:
-    """自动购票模块 - 打开浏览器等待人工登录，然后自动化购票流程"""
-    
-    def __init__(self, ticket_manager: TicketManager, headless: bool = False):
+    def __init__(self, ticket_manager=None, headless: bool = False):
         self.ticket_manager = ticket_manager
         self.headless = headless
-        self.driver = None
+        self.driver: Optional[webdriver.Chrome] = None
         self.status = BookingStatus.PENDING
         self.error_message = ""
         self.logger = self._setup_logger()
-        
-        # 12306相关URL
         self.base_url = "https://www.12306.cn"
         self.ticket_url = "https://kyfw.12306.cn/otn/leftTicket/init"
-        
-        # 配置等待时间
         self.wait_timeout = 30
-        self.poll_interval = 1
-        
-        # 登录状态检查
+        self.poll_interval = 0.5
         self.login_check_interval = 2
-        self.max_login_wait_time = 300  # 5分钟登录时间
-    
+        self.max_login_wait_time = 300
+
     def _setup_logger(self) -> logging.Logger:
-        """设置日志"""
         logger = logging.getLogger("AutoBooking")
         logger.setLevel(logging.INFO)
-        
-        # 创建文件处理器
-        file_handler = logging.FileHandler("booking.log", encoding='utf-8')
-        file_handler.setLevel(logging.INFO)
-        
-        # 创建控制台处理器
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.INFO)
-        
-        # 创建格式器
-        formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        )
-        file_handler.setFormatter(formatter)
-        console_handler.setFormatter(formatter)
-        
-        # 添加处理器
-        logger.addHandler(file_handler)
-        logger.addHandler(console_handler)
-        
+        if not logger.handlers:
+            fh = logging.FileHandler("booking.log", encoding="utf-8")
+            ch = logging.StreamHandler()
+            fmt = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+            fh.setFormatter(fmt)
+            ch.setFormatter(fmt)
+            logger.addHandler(fh)
+            logger.addHandler(ch)
         return logger
-    
+
     def init_driver(self) -> bool:
-        """初始化浏览器驱动"""
         try:
-            # 检查Chrome是否安装
-            import subprocess
-            try:
-                result = subprocess.run(['google-chrome', '--version'], 
-                                      capture_output=True, text=True, timeout=10)
-                if result.returncode != 0:
-                    raise Exception("Chrome browser not found")
-                self.logger.info(f"Chrome版本: {result.stdout.strip()}")
-            except Exception as e:
-                self.logger.error("Chrome browser is not installed. Please install Chrome browser first.")
-                self.error_message = "Chrome浏览器未安装，请先安装Chrome浏览器"
-                return False
-            
-            self.options = Options()
+            options = Options()
             if self.headless:
-                self.options.add_argument("--headless")
-            
-            # 避免被检测为自动化工具
-            self.options.add_experimental_option('excludeSwitches', ['enable-automation'])
-            self.options.add_argument('--disable-blink-features=AutomationControlled')
-            self.options.add_argument('--disable-infobars')
-            
-            # WSL环境下需要的参数
-            self.options.add_argument('--no-sandbox')
-            self.options.add_argument('--disable-dev-shm-usage')
-            self.options.add_argument('--disable-setuid-sandbox')
-            
-            # 使用与您参考代码相同的方式初始化
-            self.driver = webdriver.Chrome(options=self.options)
+                options.add_argument("--headless=new")
+            # 反自动化指纹
+            options.add_experimental_option('excludeSwitches', ['enable-automation'])
+            options.add_argument('--disable-blink-features=AutomationControlled')
+            options.add_argument('--disable-infobars')
+            options.add_argument('--no-sandbox')
+            options.add_argument('--disable-dev-shm-usage')
+            options.add_argument('--disable-setuid-sandbox')
+            self.driver = webdriver.Chrome(options=options)
             self.driver.maximize_window()
-            
-            self.driver.set_page_load_timeout(30)
+            self.driver.set_page_load_timeout(60)
             self.logger.info("浏览器驱动初始化成功")
             return True
-            
         except Exception as e:
             self.logger.error(f"初始化浏览器驱动失败: {e}")
             self.error_message = str(e)
             return False
-    
-    def open_browser_and_wait_for_login(self, from_station: str, to_station: str, 
-                                      departure_date: str) -> bool:
-        """打开浏览器并等待人工登录"""
+
+    def open_browser_and_wait_for_login(self, from_station: str, to_station: str, departure_date: str) -> bool:
         try:
             self.status = BookingStatus.WAITING_FOR_LOGIN
-            self.logger.info("打开浏览器，等待人工登录...")
-            
-            if not self.driver:
-                if not self.init_driver():
-                    return False
-            
-            # 访问12306网站
+            if not self.driver and not self.init_driver():
+                return False
+
             self.driver.get(self.base_url)
-            time.sleep(2)
-            
-            # 访问购票页面
+            time.sleep(1.5)
             self.driver.get(self.ticket_url)
-            time.sleep(2)
-            
-            # 填充查询信息
+            time.sleep(1.0)
+
             self._fill_search_form(from_station, to_station, departure_date)
-            
             print("=" * 50)
-            print("请在浏览器中完成登录操作")
-            print("登录完成后，程序将自动进行后续购票步骤")
+            print("请在浏览器中完成登录，登录后本程序将继续。")
             print("=" * 50)
-            
-            # 等待用户登录
+
             if self._wait_for_login():
                 self.logger.info("检测到用户已登录")
                 return True
             else:
                 self.logger.error("登录超时")
                 return False
-                
         except Exception as e:
             self.logger.error(f"打开浏览器失败: {e}")
             self.error_message = str(e)
             self.status = BookingStatus.FAILED
             return False
-    
+
     def _fill_search_form(self, from_station: str, to_station: str, departure_date: str) -> None:
-        """填充搜索表单"""
         try:
-            # 等待页面加载
-            time.sleep(2)
-            
-            # 定位出发地输入框，并输入站点名
-            from_input = self.driver.find_element(By.XPATH, '//input[@id="fromStationText"]')
+            wait = WebDriverWait(self.driver, self.wait_timeout)
+            # 出发地
+            from_input = wait.until(EC.element_to_be_clickable((By.ID, "fromStationText")))
             from_input.click()
-            time.sleep(0.5)
+            time.sleep(0.2)
+            from_input.clear()
             from_input.send_keys(from_station)
-            time.sleep(0.5)
-            
-            # 点击确定按钮（如果有）
-            try:
-                confirm_btn = self.driver.find_element(By.XPATH, '//span[@class="ralign"]')
-                confirm_btn.click()
-            except:
-                pass
-            time.sleep(0.5)
-            
-            # 定位目的地输入框，并输入站点名
-            to_input = self.driver.find_element(By.XPATH, '//input[@id="toStationText"]')
+            time.sleep(0.2)
+            # 关闭下拉
+            from_input.send_keys(Keys.ENTER)
+            time.sleep(0.2)
+
+            # 目的地
+            to_input = wait.until(EC.element_to_be_clickable((By.ID, "toStationText")))
             to_input.click()
-            time.sleep(0.5)
+            time.sleep(0.2)
+            to_input.clear()
             to_input.send_keys(to_station)
-            time.sleep(0.5)
-            
-            # 点击确定按钮（如果有）
-            try:
-                confirm_btn = self.driver.find_element(By.XPATH, '//span[@class="ralign"]')
-                confirm_btn.click()
-            except:
-                pass
-            time.sleep(0.5)
-            
-            # 定位日期输入框，并输入对应的日期
-            date_input = self.driver.find_element(By.XPATH, '//input[@id="train_date"]')
+            time.sleep(0.2)
+            to_input.send_keys(Keys.ENTER)
+            time.sleep(0.2)
+
+            # 日期
+            date_input = wait.until(EC.element_to_be_clickable((By.ID, "train_date")))
+            date_input.click()
+            time.sleep(0.2)
             date_input.clear()
             date_input.send_keys(departure_date)
-            time.sleep(0.5)
-            
+            time.sleep(0.2)
             self.logger.info("搜索表单填充完成")
-            
         except Exception as e:
             self.logger.error(f"填充搜索表单失败: {e}")
             raise
-    
+
     def _wait_for_login(self) -> bool:
-        """等待用户登录"""
-        start_time = time.time()
-        
-        while time.time() - start_time < self.max_login_wait_time:
+        start = time.time()
+        while time.time() - start < self.max_login_wait_time:
             try:
-                # 检查是否存在登录后的元素
-                # 1. 检查是否有欢迎信息
-                try:
-                    welcome_element = self.driver.find_element(By.CLASS_NAME, "welcome-name")
-                    if welcome_element.is_displayed():
-                        return True
-                except:
-                    pass
-                
-                # 2. 检查是否有用户名显示
-                try:
-                    username_element = self.driver.find_element(By.XPATH, '//a[contains(@class, "username")]')
-                    if username_element.is_displayed():
-                        return True
-                except:
-                    pass
-                
-                # 3. 检查是否有退出登录按钮
-                try:
-                    logout_element = self.driver.find_element(By.XPATH, '//a[text()="退出"]')
-                    if logout_element.is_displayed():
-                        return True
-                except:
-                    pass
-                
-                # 4. 检查是否还在登录页面
-                try:
-                    login_page = self.driver.find_element(By.ID, "J-login")
-                    if login_page.is_displayed():
-                        print(f"等待登录中... (已等待 {int(time.time() - start_time)} 秒)")
-                        time.sleep(self.login_check_interval)
-                except:
-                    # 如果找不到登录页面元素，可能已经登录
+                # 检查登录状态
+                if self._exists((By.XPATH, "//a[contains(text(),'退出')]")):
                     return True
-                
-            except Exception as e:
-                self.logger.debug(f"登录检查异常: {e}")
+                if self._exists((By.XPATH, "//*[contains(text(),'您好') and contains(text(),'|')]")):
+                    return True
                 time.sleep(self.login_check_interval)
-        
+            except Exception:
+                time.sleep(self.login_check_interval)
         return False
-    
+
     def search_tickets(self, max_retries: int = 3) -> bool:
-        """搜索车票"""
         try:
             self.status = BookingStatus.SEARCHING
-            self.logger.info("开始搜索车票...")
-            
+            wait = WebDriverWait(self.driver, self.wait_timeout)
             for attempt in range(max_retries):
                 try:
-                    # 点击查询按钮
-                    query_button = self.driver.find_element(By.XPATH, '//a[@id="query_ticket"]')
+                    query_button = wait.until(EC.element_to_be_clickable((By.ID, "query_ticket")))
                     query_button.click()
-                    time.sleep(0.5)
-                    
-                    # 等待查询结果
-                    time.sleep(2)
-                    
-                    # 检查是否有结果
-                    try:
-                        result_rows = self.driver.find_elements(By.XPATH, "//tbody[@id='queryLeftTable']/tr")
-                        if result_rows:
-                            self.logger.info("车票搜索成功")
-                            return True
-                        else:
-                            self.logger.warning("未找到车票信息")
-                            return False
-                    except:
-                        self.logger.warning("查询结果页面加载异常")
-                        return False
-                    
+                    time.sleep(1.0)
+                    # 检查查询结果
+                    rows = self.driver.find_elements(By.XPATH, "//tbody[@id='queryLeftTable']/tr[not(contains(@class,'tips'))]")
+                    if rows:
+                        self.logger.info("车票搜索成功")
+                        return True
+                    time.sleep(2.0)
                 except Exception as e:
-                    self.logger.warning(f"第 {attempt + 1} 次搜索失败: {e}")
-                    if attempt == max_retries - 1:
-                        raise
-                    time.sleep(2)
-            
+                    self.logger.warning(f"第 {attempt+1} 次搜索异常: {e}")
+                    time.sleep(2.0)
             return False
-            
         except Exception as e:
             self.logger.error(f"搜索车票失败: {e}")
             self.error_message = str(e)
             self.status = BookingStatus.FAILED
             return False
-    
+
     def select_train(self, train_number: str) -> bool:
-        """选择特定车次"""
         try:
             self.status = BookingStatus.SELECTING_TRAIN
-            self.logger.info(f"选择车次: {train_number}")
-            
-            # 等待车次列表加载
-            time.sleep(2)
-            
-            # 查找目标车次 - 基于实际12306页面结构
-            train_rows = self.driver.find_elements(By.XPATH, "//tbody[@id='queryLeftTable']/tr")
-            self.logger.info(f"找到 {len(train_rows)} 个车次行")
-            
-            for row in train_rows:
+            time.sleep(1.0)
+            rows = self.driver.find_elements(By.XPATH, "//tbody[@id='queryLeftTable']/tr")
+            for row in rows:
                 try:
-                    # 跳过没有车次信息的行
-                    if 'btm' in row.get_attribute('class') or row.get_attribute('style'):
+                    # 跳过无效行
+                    cls = row.get_attribute("class") or ""
+                    style = row.get_attribute("style") or ""
+                    if "btm" in cls or "display: none" in style:
                         continue
                     
-                    # 方法1: 通过车次名称精确匹配
+                    # 检查车次
+                    train_text = ""
                     try:
-                        # 尝试多种XPath定位器找到车次名称
-                        train_name_element = None
-                        train_text = ""
-                        
-                        # 策略1: 尝试直接从td[1]获取
-                        try:
-                            td1 = row.find_element(By.XPATH, "./td[1]")
-                            train_text = td1.text.strip()
-                            self.logger.info(f"策略1 - td1文本: '{train_text}'")
-                            if train_number.strip() in train_text:
-                                train_name_element = td1
-                        except Exception as e:
-                            self.logger.debug(f"策略1失败: {e}")
-                        
-                        # 策略2: 尝试从td[1]内的链接获取
-                        if not train_name_element:
-                            try:
-                                train_name_element = row.find_element(By.XPATH, "./td[1]//a")
-                                train_text = train_name_element.text.strip()
-                                self.logger.info(f"策略2 - td1//a文本: '{train_text}'")
-                            except Exception as e:
-                                self.logger.debug(f"策略2失败: {e}")
-                        
-                        # 策略3: 尝试从第一个td获取
-                        if not train_text:
-                            try:
-                                first_td = row.find_element(By.XPATH, "./td[1]")
-                                train_text = first_td.text.strip()
-                                self.logger.info(f"策略3 - 第一个td文本: '{train_text}'")
-                            except Exception as e:
-                                self.logger.debug(f"策略3失败: {e}")
-                        
-                        if not train_text:
-                            self.logger.debug("未找到车次文本")
-                            continue
-                            
-                        self.logger.info(f"检查车次: 目标='{train_number}', 实际='{train_text}'")
-                        if train_number.strip() in train_text:
-                            self.logger.info(f"找到目标车次 {train_number} (实际显示: {train_text})，尝试点击预订按钮...")
-                            
-                            # 详细调试该行的HTML结构
-                            try:
-                                row_html = row.get_attribute('outerHTML')
-                                self.logger.debug(f"车次 {train_number} 所在行的HTML结构: {row_html[:200]}...")
-                            except:
-                                pass
-                            
-                            # 策略1: 查找所有可能的预订按钮
-                            try:
-                                book_buttons = row.find_elements(By.XPATH, ".//a[contains(text(), '预订')]")
-                                self.logger.info(f"在车次 {train_number} 行找到 {len(book_buttons)} 个预订按钮")
-                                
-                                for i, button in enumerate(book_buttons):
-                                    try:
-                                        if button.is_displayed() and button.is_enabled():
-                                            button.click()
-                                            self.logger.info(f"车次 {train_number} 选择成功 (策略1-按钮{i+1})")
-                                            return True
-                                    except Exception as e:
-                                        self.logger.debug(f"按钮{i+1}点击失败: {e}")
-                                        continue
-                            except Exception as e:
-                                self.logger.debug(f"策略1失败: {e}")
-                            
-                            # 策略2: 查找第13个td中的链接
-                            try:
-                                td13 = row.find_element(By.XPATH, "./td[13]")
-                                links = td13.find_elements(By.TAG_NAME, "a")
-                                self.logger.info(f"在td[13]找到 {len(links)} 个链接")
-                                
-                                for i, link in enumerate(links):
-                                    try:
-                                        if link.is_displayed() and link.is_enabled():
-                                            link_text = link.text
-                                            self.logger.info(f"点击链接: '{link_text}'")
-                                            link.click()
-                                            self.logger.info(f"车次 {train_number} 选择成功 (策略2-链接{i+1})")
-                                            return True
-                                    except Exception as e:
-                                        self.logger.debug(f"链接{i+1}点击失败: {e}")
-                                        continue
-                            except Exception as e:
-                                self.logger.debug(f"策略2失败: {e}")
-                            
-                            # 策略3: 查找所有可点击的链接元素
-                            try:
-                                all_links = row.find_elements(By.TAG_NAME, "a")
-                                self.logger.info(f"在车次行找到 {len(all_links)} 个链接")
-                                
-                                for i, link in enumerate(all_links):
-                                    try:
-                                        if link.is_displayed() and link.is_enabled():
-                                            link_text = link.text.strip()
-                                            if link_text in ['预订', '']:
-                                                link.click()
-                                                self.logger.info(f"车次 {train_number} 选择成功 (策略3-链接{i+1})")
-                                                return True
-                                    except Exception as e:
-                                        self.logger.debug(f"链接{i+1}点击失败: {e}")
-                                        continue
-                            except Exception as e:
-                                self.logger.debug(f"策略3失败: {e}")
-                            
-                            # 策略4: 使用JavaScript点击
-                            try:
-                                book_buttons = row.find_elements(By.XPATH, ".//a[contains(text(), '预订')]")
-                                for i, button in enumerate(book_buttons):
-                                    try:
-                                        self.driver.execute_script("arguments[0].click();", button)
-                                        self.logger.info(f"车次 {train_number} 选择成功 (策略4-JS点击{i+1})")
-                                        return True
-                                    except Exception as e:
-                                        self.logger.debug(f"JS点击{i+1}失败: {e}")
-                                        continue
-                            except Exception as e:
-                                self.logger.debug(f"策略4失败: {e}")
-                    except Exception as e:
-                        self.logger.debug(f"方法1失败: {e}")
+                        train_td = row.find_element(By.XPATH, "./td[1]")
+                        train_text = train_td.text.strip()
+                    except Exception:
+                        pass
+                    
+                    if not train_text or train_number not in train_text:
                         continue
                     
-                    # 方法5: 通过行文本内容模糊匹配
+                    # 点击预订按钮
+                    book = row.find_elements(By.XPATH, ".//a[contains(text(),'预订')]")
+                    for b in book:
+                        if b.is_displayed() and b.is_enabled():
+                            self._safe_click(b)
+                            if self._wait_for_order_page():
+                                self.logger.info(f"已进入订单页（车次 {train_number}）")
+                                return True
+                    
+                    # 兜底方案
                     try:
-                        row_text = row.text
-                        self.logger.info(f"检查行文本匹配: 目标='{train_number}', 行文本='{row_text[:100]}...'")
-                        if train_number in row_text:
-                            self.logger.info(f"通过文本内容找到车次 {train_number}，尝试各种点击方式...")
-                            
-                            # 复用上面的点击策略
-                            click_strategies = [
-                                lambda: self._click_book_buttons(row, train_number),
-                                lambda: self._click_td13_links(row, train_number),
-                                lambda: self._click_any_link(row, train_number),
-                                lambda: self._js_click_book_buttons(row, train_number)
-                            ]
-                            
-                            for i, strategy in enumerate(click_strategies):
-                                try:
-                                    if strategy():
-                                        self.logger.info(f"车次 {train_number} 选择成功 (方法5-策略{i+1})")
-                                        return True
-                                except Exception as e:
-                                    self.logger.debug(f"方法5-策略{i+1}失败: {e}")
-                                    continue
-                    except Exception as e:
-                        self.logger.debug(f"方法5失败: {e}")
-                        continue
-                        
-                except Exception as e:
-                    self.logger.debug(f"处理车次行失败: {e}")
+                        td13 = row.find_element(By.XPATH, "./td[13]")
+                        links = td13.find_elements(By.TAG_NAME, "a")
+                        for lk in links:
+                            if lk.is_displayed() and lk.is_enabled():
+                                self._safe_click(lk)
+                                if self._wait_for_order_page():
+                                    self.logger.info(f"已进入订单页（车次 {train_number}，td13 兜底）")
+                                    return True
+                    except Exception:
+                        pass
+                except Exception:
                     continue
-            
-            # 如果还是没找到，打印当前页面的车次信息用于调试
-            try:
-                self.logger.info("当前页面的车次信息:")
-                all_trains = self.driver.find_elements(By.XPATH, "//tbody[@id='queryLeftTable']/tr")
-                for i, train in enumerate(all_trains[:5]):  # 只打印前5个车次
-                    try:
-                        train_info = train.text
-                        self.logger.info(f"车次 {i+1}: {train_info[:100]}...")
-                        
-                        # 打印该行的预订按钮信息
-                        try:
-                            book_buttons = train.find_elements(By.XPATH, ".//a[contains(text(), '预订')]")
-                            self.logger.info(f"  - 预订按钮数量: {len(book_buttons)}")
-                            for j, btn in enumerate(book_buttons):
-                                self.logger.info(f"    按钮{j+1}: 显示={btn.is_displayed()}, 可用={btn.is_enabled()}, 文本='{btn.text}'")
-                        except:
-                            pass
-                    except:
-                        self.logger.info(f"车次 {i+1}: 无法获取车次信息")
-            except:
-                pass
-            
-            raise Exception(f"未找到车次 {train_number} 或该车次不可预订")
-            
+            raise Exception(f"未找到可预订的目标车次 {train_number}")
         except Exception as e:
             self.logger.error(f"选择车次失败: {e}")
             self.error_message = str(e)
             self.status = BookingStatus.FAILED
             return False
-    
-    def _click_book_buttons(self, row, train_number):
-        """点击预订按钮策略"""
-        book_buttons = row.find_elements(By.XPATH, ".//a[contains(text(), '预订')]")
-        for button in book_buttons:
-            if button.is_displayed() and button.is_enabled():
-                button.click()
-                return True
-        return False
-    
-    def _click_td13_links(self, row, train_number):
-        """点击td[13]中的链接策略"""
-        td13 = row.find_element(By.XPATH, "./td[13]")
-        links = td13.find_elements(By.TAG_NAME, "a")
-        for link in links:
-            if link.is_displayed() and link.is_enabled():
-                link.click()
-                return True
-        return False
-    
-    def _click_any_link(self, row, train_number):
-        """点击任何链接策略"""
-        all_links = row.find_elements(By.TAG_NAME, "a")
-        for link in all_links:
-            if link.is_displayed() and link.is_enabled():
-                link_text = link.text.strip()
-                if link_text in ['预订', '']:
-                    link.click()
-                    return True
-        return False
-    
-    def _js_click_book_buttons(self, row, train_number):
-        """使用JavaScript点击预订按钮策略"""
-        book_buttons = row.find_elements(By.XPATH, ".//a[contains(text(), '预订')]")
-        for button in book_buttons:
-            self.driver.execute_script("arguments[0].click();", button)
+
+    def _wait_for_order_page(self) -> bool:
+        wait = WebDriverWait(self.driver, 30)
+        try:
+            wait.until(
+                EC.any_of(
+                    EC.presence_of_element_located((By.XPATH, "//*[contains(text(),'乘客信息')]")),
+                    EC.presence_of_element_located((By.XPATH, "//a[normalize-space(text())='提交订单']")),
+                    EC.presence_of_element_located((By.XPATH, "//*[contains(text(),'选座喽') or contains(text(),'选铺喽')]"))
+                )
+            )
+            time.sleep(0.5)
             return True
-        return False
-    
+        except TimeoutException:
+            return False
+
     def select_passengers_and_seats(self, passengers: List[Passenger]) -> bool:
-        """选择乘客和席次"""
         try:
             self.status = BookingStatus.SELECTING_SEATS
-            self.logger.info("选择乘客和席次...")
+            wait = WebDriverWait(self.driver, self.wait_timeout)
             
-            # 等待页面加载完成
-            time.sleep(2)
+            # 选择乘车人
+            if not self._select_passengers_from_list(passengers, wait):
+                self.logger.info("常用联系人列表未能选中，尝试搜索框选择...")
+                if not self._select_passengers_by_search(passengers):
+                    raise RuntimeError("未能选中任何乘车人")
             
-            # 尝试切换到可能包含乘客信息的frame
-            frame_switched = False
-            try:
-                # 策略1: 查找所有iframe并尝试切换
-                iframes = self.driver.find_elements(By.TAG_NAME, "iframe")
-                self.logger.info(f"找到 {len(iframes)} 个iframe")
-                
-                for i, iframe in enumerate(iframes):
-                    try:
-                        self.driver.switch_to.frame(iframe)
-                        self.logger.info(f"切换到iframe {i+1}")
-                        
-                        # 检查frame中是否有乘客相关内容
-                        try:
-                            passenger_elements = self.driver.find_elements(By.XPATH, "//*[contains(text(), '乘车人') or contains(text(), 'passenger')]")
-                            if passenger_elements:
-                                self.logger.info(f"iframe {i+1} 中找到乘客相关元素")
-                                frame_switched = True
-                                break
-                            else:
-                                self.logger.debug(f"iframe {i+1} 中未找到乘客相关元素")
-                        except:
-                            self.logger.debug(f"iframe {i+1} 检查失败")
-                        
-                        # 如果没有找到，切换回主文档
-                        self.driver.switch_to.default_content()
-                    except Exception as e:
-                        self.logger.debug(f"切换iframe {i+1} 失败: {e}")
-                        try:
-                            self.driver.switch_to.default_content()
-                        except:
-                            pass
-            except Exception as e:
-                self.logger.debug(f"iframe切换过程失败: {e}")
-                try:
-                    self.driver.switch_to.default_content()
-                except:
-                    pass
+            # 设置席别/票种
+            if not self._assign_seat_and_ticket(passengers, wait):
+                raise RuntimeError("设置席别/票种失败")
             
-            # 如果没有成功切换到frame，在主文档中查找
-            if not frame_switched:
-                self.logger.info("在主文档中查找乘客信息")
-                self.driver.switch_to.default_content()
+            # 选座/选铺
+            for p in passengers:
+                self._pick_seat_position_for_passenger(p, wait)
             
-            # 使用搜索框策略选择乘客
-            return self._select_passengers_by_search(passengers)
-            
+            self.logger.info("乘客与席别选择完成")
+            return True
         except Exception as e:
             self.logger.error(f"选择乘客和席次失败: {e}")
             self.error_message = str(e)
             self.status = BookingStatus.FAILED
             return False
-    
-    def _select_passengers_by_search(self, passengers: List[Passenger]) -> bool:
-        """使用搜索框选择乘客"""
-        try:
-            self.logger.info("开始使用搜索框选择乘客...")
-            self.logger.info(f"需要选择的乘客列表: {[p.name for p in passengers]}")
-            
-            # 等待搜索框加载
-            search_box = None
-            search_button = None
-            try:
-                search_box = WebDriverWait(self.driver, self.wait_timeout).until(
-                    EC.presence_of_element_located((By.ID, "quickQueryPassenger_id"))
-                )
-                self.logger.info("✓ 找到乘客搜索框 (ID: quickQueryPassenger_id)")
-                
-                # 查找搜索按钮
-                search_button = self.driver.find_element(By.ID, "submit_quickQueryPassenger")
-                self.logger.info("✓ 找到搜索按钮 (ID: submit_quickQueryPassenger)")
-                
-                # 调试搜索框属性
-                try:
-                    self.logger.debug(f"搜索框属性: tag={search_box.tag_name}, type={search_box.get_attribute('type')}, value='{search_box.get_attribute('value')}'")
-                except:
-                    pass
-                    
-            except Exception as e:
-                self.logger.warning(f"✗ 未找到乘客搜索框: {e}")
-                self.logger.info("回退到备用选择方法...")
-                # 回退到原来的选择方法
-                return self._select_passengers_fallback(passengers)
-            
-            # 清空搜索框
-            try:
-                search_box.clear()
-                self.logger.info("✓ 清空搜索框")
-            except Exception as e:
-                self.logger.debug(f"清空搜索框失败: {e}")
-            
-            # 记录页面上的所有复选框状态
-            try:
-                all_checkboxes = self.driver.find_elements(By.XPATH, "//input[@type='checkbox']")
-                self.logger.debug(f"搜索前页面上有 {len(all_checkboxes)} 个复选框")
-                for i, cb in enumerate(all_checkboxes[:5]):  # 只显示前5个
-                    try:
-                        self.logger.debug(f"  复选框{i+1}: 显示={cb.is_displayed()}, 选中={cb.is_selected()}, title={cb.get_attribute('title')}")
-                    except:
-                        pass
-            except:
-                pass
-            
-            for passenger in passengers:
-                try:
-                    self.logger.info(f"🔍 开始搜索乘客: {passenger.name}")
-                    
-                    # 先清空搜索框显示所有乘客
-                    search_box.clear()
-                    self.logger.debug("✓ 清空搜索框，准备显示所有乘客")
-                    
-                    # 等待所有乘客加载
-                    time.sleep(0.5)
-                    
-                    # 尝试通过拼音搜索（如果适用）
-                    if len(passenger.name) >= 2:
-                        # 尝试拼音首字母搜索（如"鞠放" -> "jf"）
-                        pinyin_search = passenger.name[0] + passenger.name[1]
-                        self.logger.info(f"尝试拼音首字母搜索: '{pinyin_search}'")
-                        
-                        search_box.send_keys(pinyin_search)
-                        # 点击搜索按钮
-                        if search_button:
-                            search_button.click()
-                            self.logger.info("✓ 点击搜索按钮")
-                        time.sleep(1)
-                        
-                        # 检查是否能找到乘客
-                        if self._try_select_passenger_by_search(passenger, pinyin_search):
-                            self.logger.info(f"✅ 通过拼音搜索成功选中乘客 {passenger.name}")
-                            passenger_selected = True
-                        else:
-                            self.logger.info(f"拼音搜索未找到 {passenger.name}，尝试其他方式")
-                    
-                    # 如果拼音搜索失败，尝试直接搜索
-                    if not passenger_selected:
-                        search_box.clear()
-                        search_box.send_keys(passenger.name)
-                        self.logger.info(f"✓ 在搜索框中输入完整姓名: '{passenger.name}'")
-                        
-                        # 点击搜索按钮
-                        if search_button:
-                            search_button.click()
-                            self.logger.info("✓ 点击搜索按钮")
-                        
-                        # 等待搜索结果
-                        self.logger.debug("等待搜索结果加载...")
-                        time.sleep(1)
-                    
-                    # 记录搜索后的复选框状态
-                    try:
-                        search_checkboxes = self.driver.find_elements(By.XPATH, "//input[@type='checkbox']")
-                        self.logger.debug(f"搜索后页面上有 {len(search_checkboxes)} 个复选框")
-                        for i, cb in enumerate(search_checkboxes[:5]):  # 只显示前5个
-                            try:
-                                self.logger.debug(f"  搜索后复选框{i+1}: 显示={cb.is_displayed()}, 选中={cb.is_selected()}, title={cb.get_attribute('title')}")
-                            except:
-                                pass
-                    except:
-                        pass
-                    
-                    # 尝试多种方式选择搜索到的乘客
-                    passenger_selected = False
-                    
-                    # 尝试选择乘客
-                    if self._try_select_passenger_by_search(passenger, passenger.name):
-                        self.logger.info(f"✅ 通过搜索成功选中乘客 {passenger.name}")
-                        passenger_selected = True
-                    else:
-                        self.logger.info(f"搜索未找到 {passenger.name}，尝试在完整列表中查找")
-                        
-                        # 清空搜索框显示所有乘客
-                        search_box.clear()
-                        if search_button:
-                            search_button.click()
-                        time.sleep(1)
-                        
-                        # 在完整列表中查找
-                        if self._try_select_passenger_in_full_list(passenger):
-                            self.logger.info(f"✅ 在完整列表中成功选中乘客 {passenger.name}")
-                            passenger_selected = True
-                    
-                    passenger_selected = False  # 这个变量已在上面定义
-                    
-                    if not passenger_selected:
-                        self.logger.warning(f"❌ 无法通过搜索选中乘客 {passenger.name}")
-                        # 记录当前页面状态用于调试
-                        try:
-                            page_source = self.driver.page_source
-                            if passenger.name in page_source:
-                                self.logger.info(f"  页面中包含乘客姓名 '{passenger.name}'，但可能结构不匹配")
-                            else:
-                                self.logger.warning(f"  页面中未找到乘客姓名 '{passenger.name}'")
-                        except:
-                            pass
-                    else:
-                        self.logger.info(f"✅ 乘客 {passenger.name} 选择成功")
-                    
-                    # 清空搜索框为下一个乘客做准备
-                    try:
-                        search_box.clear()
-                        self.logger.debug(f"✅ 清空搜索框为下一个乘客做准备")
-                    except Exception as e:
-                        self.logger.debug(f"清空搜索框失败: {e}")
-                        
-                except Exception as e:
-                    self.logger.error(f"❌ 选择乘客 {passenger.name} 失败: {e}")
-                    # 记录异常时的页面状态
-                    try:
-                        self.logger.debug("失败时的页面状态:")
-                        all_checkboxes = self.driver.find_elements(By.XPATH, "//input[@type='checkbox']")
-                        self.logger.debug(f"  当前页面上有 {len(all_checkboxes)} 个复选框")
-                    except:
-                        pass
-                    continue
-            
-            self.logger.info("🎉 乘客搜索选择完成")
-            return True
-            
-        except Exception as e:
-            self.logger.error(f"搜索选择乘客失败: {e}")
-            return self._select_passengers_fallback(passengers)
-    
-    def _try_select_passenger_by_search(self, passenger: Passenger, search_term: str) -> bool:
-        """在搜索结果中尝试选择乘客"""
-        try:
-            self.logger.debug(f"尝试在搜索结果中选择乘客: {passenger.name}, 搜索词: {search_term}")
-            
-            # 策略1: 通过title属性匹配乘客
-            checkbox_patterns = [
-                f"//input[@title='设置为乘车人，按空格键进行操作' and contains(@*, '{passenger.name}')]",
-                f"//input[@title='乘车人' and contains(@*, '{passenger.name}')]",
-                f"//input[@type='checkbox' and contains(@*, '{passenger.name}')]"
-            ]
-            
-            for i, pattern in enumerate(checkbox_patterns):
-                try:
-                    self.logger.debug(f"  模式{i+1}: {pattern}")
-                    checkboxes = self.driver.find_elements(By.XPATH, pattern)
-                    self.logger.debug(f"  模式{i+1}找到 {len(checkboxes)} 个匹配的复选框")
-                    
-                    for j, checkbox in enumerate(checkboxes):
-                        try:
-                            is_displayed = checkbox.is_displayed()
-                            is_selected = checkbox.is_selected()
-                            title = checkbox.get_attribute('title')
-                            self.logger.debug(f"    复选框{j+1}: 显示={is_displayed}, 选中={is_selected}, title='{title}'")
-                            
-                            if is_displayed and not is_selected:
-                                checkbox.click()
-                                self.logger.info(f"✅ 通过复选框选中乘客 {passenger.name} (模式{i+1}-复选框{j+1})")
-                                return True
-                            elif is_displayed and is_selected:
-                                self.logger.info(f"✅ 乘客 {passenger.name} 已被选中 (模式{i+1}-复选框{j+1})")
-                                return True
-                        except Exception as e:
-                            self.logger.debug(f"    点击复选框{j+1}失败: {e}")
-                            continue
-                    
-                except Exception as e:
-                    self.logger.debug(f"  模式{i+1}搜索失败: {e}")
-            
-            # 策略2: 在搜索结果中查找包含乘客姓名的行
-            passenger_rows = self.driver.find_elements(By.XPATH, 
-                "//tbody[@id='normal_passenger_id']/tr | //tbody[@id='dj_passenger_id']/tr | //table//tr[.//input[@type='checkbox']]")
-            
-            for i, row in enumerate(passenger_rows):
-                try:
-                    row_text = row.text
-                    if passenger.name in row_text:
-                        self.logger.debug(f"  在行{i+1}中找到乘客 {passenger.name}: '{row_text[:50]}...'")
-                        
-                        # 尝试点击该行的复选框
-                        checkbox = row.find_element(By.XPATH, ".//input[@type='checkbox']")
-                        if checkbox.is_displayed() and not checkbox.is_selected():
-                            checkbox.click()
-                            self.logger.info(f"✅ 通过行匹配选中乘客 {passenger.name} (行{i+1})")
-                            return True
-                        elif checkbox.is_displayed() and checkbox.is_selected():
-                            self.logger.info(f"✅ 乘客 {passenger.name} 已被选中 (行{i+1})")
-                            return True
-                except Exception as e:
-                    self.logger.debug(f"    处理行{i+1}失败: {e}")
-                    continue
-            
-            return False
-            
-        except Exception as e:
-            self.logger.debug(f"搜索选择乘客失败: {e}")
-            return False
-    
-    def _try_select_passenger_in_full_list(self, passenger: Passenger) -> bool:
-        """在完整乘客列表中选择乘客"""
-        try:
-            self.logger.debug(f"尝试在完整乘客列表中选择: {passenger.name}")
-            
-            # 查找所有显示的乘客列表
-            try:
-                # 查找乘车人列表
-                normal_passengers = self.driver.find_elements(By.XPATH, "//ul[@id='normal_passenger_id']//li")
-                dj_passengers = self.driver.find_elements(By.XPATH, "//ul[@id='dj_passenger_id']//li")
-                
-                self.logger.debug(f"找到 {len(normal_passengers)} 个乘车人，{len(dj_passengers)} 个受让人")
-                
-                # 检查乘车人列表
-                for i, li in enumerate(normal_passengers):
-                    try:
-                        if passenger.name in li.text:
-                            self.logger.debug(f"  在乘车人列表{i+1}中找到: '{li.text[:50]}...'")
-                            
-                            # 查找该li元素中的复选框
-                            checkbox = li.find_element(By.XPATH, ".//input[@type='checkbox']")
-                            if checkbox.is_displayed() and not checkbox.is_selected():
-                                checkbox.click()
-                                self.logger.info(f"✅ 在乘车人列表中选中 {passenger.name} (列表项{i+1})")
-                                return True
-                            elif checkbox.is_displayed() and checkbox.is_selected():
-                                self.logger.info(f"✅ 乘客 {passenger.name} 已被选中 (乘车人列表项{i+1})")
-                                return True
-                    except Exception as e:
-                        self.logger.debug(f"    处理乘车人列表项{i+1}失败: {e}")
-                        continue
-                
-                # 检查受让人列表
-                for i, li in enumerate(dj_passengers):
-                    try:
-                        if passenger.name in li.text:
-                            self.logger.debug(f"  在受让人列表{i+1}中找到: '{li.text[:50]}...'")
-                            
-                            # 查找该li元素中的复选框
-                            checkbox = li.find_element(By.XPATH, ".//input[@type='checkbox']")
-                            if checkbox.is_displayed() and not checkbox.is_selected():
-                                checkbox.click()
-                                self.logger.info(f"✅ 在受让人列表中选中 {passenger.name} (列表项{i+1})")
-                                return True
-                            elif checkbox.is_displayed() and checkbox.is_selected():
-                                self.logger.info(f"✅ 乘客 {passenger.name} 已被选中 (受让人列表项{i+1})")
-                                return True
-                    except Exception as e:
-                        self.logger.debug(f"    处理受让人列表项{i+1}失败: {e}")
-                        continue
-                        
-            except Exception as e:
-                self.logger.debug(f"查找乘客列表失败: {e}")
-            
-            # 策略3: 通过JavaScript在完整列表中查找
-            js_script = f"""
-                var allLis = document.querySelectorAll('#normal_passenger_id li, #dj_passenger_id li');
-                for (var i = 0; i < allLis.length; i++) {{
-                    var li = allLis[i];
-                    if (li.textContent && li.textContent.includes('{passenger.name}')) {{
-                        console.log('在列表项中找到乘客:', i, li.textContent.substring(0, 50));
-                        var checkbox = li.querySelector('input[type="checkbox"]');
-                        if (checkbox && !checkbox.checked) {{
-                            checkbox.click();
-                            console.log('已点击复选框');
-                        }}
-                        return true;
-                    }}
-                }}
-                console.log('在完整列表中未找到乘客');
-                return false;
-            """
-            
-            result = self.driver.execute_script(js_script)
-            if result:
-                self.logger.info(f"✅ 通过JavaScript在完整列表中选中乘客 {passenger.name}")
-                return True
-            
-            return False
-            
-        except Exception as e:
-            self.logger.debug(f"在完整列表中选择乘客失败: {e}")
-            return False
-    
-    def _select_passengers_fallback(self, passengers: List[Passenger]) -> bool:
-        """备用乘客选择方法"""
-        try:
-            self.logger.info("使用备用方法选择乘客...")
-            
-            # 尝试多种方式定位乘客区域
-            passenger_found = False
-            location_strategies = [
-                # 策略1: 通过ID
-                lambda: self.driver.find_element(By.ID, "normal_passenger_id"),
-                # 策略2: 通过包含"乘车人"文本的元素
-                lambda: self.driver.find_element(By.XPATH, "//*[contains(text(), '乘车人')]"),
-                # 策略3: 通过title属性
-                lambda: self.driver.find_element(By.XPATH, '//input[@title="乘车人"]'),
-                # 策略4: 通过复选框
-                lambda: self.driver.find_element(By.XPATH, '//input[@type="checkbox"]'),
-            ]
-            
-            passenger_container = None
-            for i, strategy in enumerate(location_strategies):
-                try:
-                    passenger_container = strategy()
-                    self.logger.info(f"备用策略{i+1}成功找到乘客容器")
-                    passenger_found = True
-                    break
-                except Exception as e:
-                    self.logger.debug(f"备用策略{i+1}失败: {e}")
-            
-            if not passenger_found:
-                self.logger.error("备用方法也未找到乘客选择区域")
-                return False
-            
-            # 查找乘客行并选择
-            passenger_rows = []
-            try:
-                passenger_rows = self.driver.find_elements(By.XPATH, "//tbody[@id='normal_passenger_id']/tr")
-                self.logger.info(f"通过normal_passenger_id找到 {len(passenger_rows)} 个乘客行")
-            except:
-                self.logger.debug("normal_passenger_id定位失败")
-            
-            if not passenger_rows:
-                try:
-                    passenger_rows = self.driver.find_elements(By.XPATH, "//table//tr[.//input[@type='checkbox']]")
-                    self.logger.info(f"通过复选框找到 {len(passenger_rows)} 个乘客行")
-                except:
-                    pass
-            
-            for passenger in passengers:
-                passenger_found = False
-                for row in passenger_rows:
-                    try:
-                        row_text = row.text
-                        if passenger.name in row_text:
-                            # 尝试选择乘客
-                            checkbox = row.find_element(By.XPATH, ".//input[@type='checkbox']")
-                            if not checkbox.is_selected():
-                                checkbox.click()
-                                self.logger.info(f"备用方法选中乘客 {passenger.name}")
-                            passenger_found = True
-                            break
-                    except:
-                        continue
-                
-                if not passenger_found:
-                    self.logger.warning(f"备用方法未找到乘客 {passenger.name}")
-            
-            return True
-            
-        except Exception as e:
-            self.logger.error(f"备用乘客选择失败: {e}")
-            return False
-    
+
     def submit_order(self) -> bool:
-        """提交订单"""
         try:
             self.status = BookingStatus.SUBMITTING_ORDER
-            self.logger.info("提交订单...")
-            
-            # 点击提交订单按钮
-            submit_button = self.driver.find_element(By.XPATH, '//a[text()="提交订单"]')
-            submit_button.click()
-            time.sleep(0.5)
-            
-            # 等待订单确认页面
-            time.sleep(2)
-            
-            self.logger.info("订单提交成功")
+            wait = WebDriverWait(self.driver, self.wait_timeout)
+            btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[normalize-space(text())='提交订单']")))
+            self._safe_click(btn)
+            time.sleep(1.5)
             return True
-            
         except Exception as e:
             self.logger.error(f"提交订单失败: {e}")
             self.error_message = str(e)
             self.status = BookingStatus.FAILED
             return False
-    
+
     def confirm_order(self) -> bool:
-        """确认订单"""
         try:
             self.status = BookingStatus.CONFIRMING_PAYMENT
-            self.logger.info("确认订单...")
-            
-            # 确认订单
-            confirm_button = self.driver.find_element(By.ID, 'qr_submit_id')
-            confirm_button.click()
-            time.sleep(3)
-            
-            self.logger.info("订单确认成功")
+            wait = WebDriverWait(self.driver, self.wait_timeout)
+            btn = wait.until(EC.element_to_be_clickable((By.ID, "qr_submit_id")))
+            self._safe_click(btn)
+            time.sleep(2.0)
             self.status = BookingStatus.SUCCESS
             return True
-            
         except Exception as e:
             self.logger.error(f"确认订单失败: {e}")
             self.error_message = str(e)
             self.status = BookingStatus.FAILED
             return False
-    
+
     def auto_book_ticket(self, ticket_info: TicketInfo) -> bool:
-        """自动预订车票（主要接口）"""
         try:
             self.logger.info(f"开始自动预订: {ticket_info.train_info.train_number}")
-            
-            # 1. 打开浏览器并等待登录
             if not self.open_browser_and_wait_for_login(
                 ticket_info.train_info.departure_station,
                 ticket_info.train_info.arrival_station,
-                ticket_info.train_info.date
+                ticket_info.train_info.date,
             ):
                 return False
-            
-            # 2. 搜索车票
             if not self.search_tickets():
                 return False
-            
-            # 3. 选择车次
             if not self.select_train(ticket_info.train_info.train_number):
                 return False
-            
-            # 4. 选择乘客和席次
             if not self.select_passengers_and_seats(ticket_info.passengers):
                 return False
-            
-            # 5. 提交订单
             if not self.submit_order():
                 return False
-            
-            # 6. 确认订单
             if not self.confirm_order():
                 return False
-            
             self.logger.info("自动预订成功完成")
             return True
-            
         except Exception as e:
             self.logger.error(f"自动预订失败: {e}")
             self.error_message = str(e)
             self.status = BookingStatus.FAILED
             return False
-    
+
+    # ----------------- 辅助方法 ----------------
+    def _exists(self, locator) -> bool:
+        try:
+            self.driver.find_element(*locator)
+            return True
+        except NoSuchElementException:
+            return False
+
+    def _safe_click(self, el):
+        try:
+            self.driver.execute_script("arguments[0].click();", el)
+        except Exception:
+            el.click()
+
+    def _scroll_into_view(self, el):
+        try:
+            self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", el)
+        except Exception:
+            pass
+
+    def _normalize_seat_texts(self, seat: str) -> List[str]:
+        s = (str(seat) or "").strip()
+        mapping = {
+            "二等": "二等座", "一等": "一等座", "商务": "商务座",
+            "硬座": "硬座", "软座": "软座", "无": "无座",
+            "硬卧": "硬卧", "软卧": "软卧", "动卧": "动卧",
+            "高级软卧": "高级软卧", "一等卧": "一等卧", "二等卧": "二等卧"
+        }
+        base = mapping.get(s, s)
+        alts = {base, s}
+        if base.endswith("座") and base != "无座":
+            alts.add(base.replace("座", ""))
+        return [t for t in alts if t]
+
+    def _normalize_ticket_texts(self, ticket_type: str) -> List[str]:
+        t = (str(ticket_type) or "成人票").strip()
+        alts = {t}
+        if t.endswith("票"):
+            alts.add(t[:-1])
+        else:
+            alts.add(t + "票")
+        return list(alts)
+
+    def _select_passengers_from_list(self, passengers: List[Passenger], wait: WebDriverWait) -> bool:
+        selected_any = False
+        
+        # 展开更多按钮
+        try:
+            more_btn = self.driver.find_element(By.XPATH, "//*[contains(normalize-space(text()),'更多')]")
+            if more_btn.is_displayed():
+                self._safe_click(more_btn)
+                time.sleep(0.3)
+        except Exception:
+            pass
+        
+        # 定位乘客列表
+        containers = []
+        for xp in ["//ul[@id='normal_passenger_id']", "//ul[@id='dj_passenger_id']"]:
+            try:
+                c = wait.until(EC.presence_of_element_located((By.XPATH, xp)))
+                containers.append(c)
+            except TimeoutException:
+                continue
+        
+        if not containers:
+            return False
+        
+        # 选择乘客
+        for p in passengers:
+            found = False
+            for c in containers:
+                lis = c.find_elements(By.XPATH, ".//li[.//input[@type='checkbox']]")
+                for li in lis:
+                    try:
+                        text = li.text.strip()
+                        if p.name and p.name in text:
+                            checkbox = li.find_element(By.XPATH, ".//input[@type='checkbox']")
+                            self._scroll_into_view(li)
+                            if not checkbox.is_selected():
+                                self._safe_click(checkbox)
+                                time.sleep(0.2)
+                            found = True
+                            selected_any = True
+                            break
+                    except Exception:
+                        continue
+                if found:
+                    break
+            if not found:
+                self.logger.warning(f"未在常用乘车人列表中找到: {p.name}")
+        return selected_any
+
+    def _select_passengers_by_search(self, passengers: List[Passenger]) -> bool:
+        try:
+            search_box = WebDriverWait(self.driver, 5).until(
+                EC.presence_of_element_located((By.ID, "quickQueryPassenger_id"))
+            )
+            try:
+                search_btn = self.driver.find_element(By.ID, "submit_quickQueryPassenger")
+            except NoSuchElementException:
+                search_btn = None
+            
+            selected_any = False
+            for p in passengers:
+                try:
+                    search_box.click()
+                    time.sleep(0.1)
+                    search_box.clear()
+                    time.sleep(0.1)
+                    search_box.send_keys(p.name)
+                    if search_btn:
+                        self._safe_click(search_btn)
+                    time.sleep(0.8)
+                    
+                    # 在搜索结果中勾选
+                    patterns = [
+                        "//tbody[@id='normal_passenger_id']//tr",
+                        "//tbody[@id='dj_passenger_id']//tr",
+                        "//ul[@id='normal_passenger_id']//li",
+                        "//ul[@id='dj_passenger_id']//li",
+                        "//table//tr[.//input[@type='checkbox']]",
+                    ]
+                    chosen = False
+                    for xp in patterns:
+                        rows = self.driver.find_elements(By.XPATH, xp)
+                        for r in rows:
+                            try:
+                                if p.name in r.text:
+                                    cb = r.find_element(By.XPATH, ".//input[@type='checkbox']")
+                                    self._scroll_into_view(r)
+                                    if not cb.is_selected():
+                                        self._safe_click(cb)
+                                    chosen = True
+                                    selected_any = True
+                                    break
+                            except Exception:
+                                continue
+                        if chosen:
+                            break
+                    
+                    # 清空搜索框
+                    search_box.click()
+                    time.sleep(0.1)
+                    search_box.clear()
+                    time.sleep(0.1)
+                except Exception:
+                    continue
+            return selected_any
+        except TimeoutException:
+            return False
+
+    def _locate_passenger_table(self):
+        # 识别包含表头的表格
+        tables = self.driver.find_elements(By.XPATH, "//table[.//th]")
+        for t in tables:
+            header_text = t.text
+            if all(k in header_text for k in ["席别", "票种", "姓名"]):
+                return t
+        
+        # 兜底方案
+        try:
+            return self.driver.find_element(By.XPATH, "//table[.//th[contains(.,'姓名')]]")
+        except Exception:
+            return None
+
+    def _assign_seat_and_ticket(self, passengers: List[Passenger], wait: WebDriverWait) -> bool:
+        """基于per-ticket表格分配席别和票种 - 支持多乘客"""
+        # 优先定位per-ticket表格
+        table = None
+        for _ in range(5):
+            try:
+                table = self.driver.find_element(By.XPATH, "//table[@class='per-ticket']//tbody[@id='ticketInfo_id']")
+                if table:
+                    self.logger.info("成功定位per-ticket乘客信息表格")
+                    break
+            except Exception:
+                pass
+            
+            # 备选方案：原有表格定位方法
+            table = self._locate_passenger_table()
+            if table:
+                break
+            
+            time.sleep(0.5)
+        
+        if not table:
+            self.logger.warning("未能定位乘客信息表格，尝试直接在整页内按姓名找行")
+        
+        success = True
+        # 预先收集所有可用的乘客行，建立索引映射
+        passenger_rows = self._collect_passenger_rows(table, passengers)
+        
+        for i, p in enumerate(passengers):
+            # 使用索引映射来为每个乘客分配对应的行
+            ok_row = self._set_for_passenger_row_with_index(p, wait, table, i, passenger_rows)
+            if not ok_row:
+                success = False
+                self.logger.error(f"乘客{i+1} {p.name} 席位设置失败")
+        return success
+
+    def _collect_passenger_rows(self, table, passengers: List[Passenger]) -> List[Any]:
+        """收集所有可用的乘客行，建立索引映射"""
+        passenger_rows = []
+        
+        if table:
+            try:
+                # 获取表格中所有包含输入框的行
+                all_rows = table.find_elements(By.XPATH, ".//tr")
+                # 找到包含席次选择下拉框的行（乘客信息行）
+                for row in all_rows:
+                    # 检查行是否包含席次选择下拉框
+                    seat_selects = row.find_elements(By.XPATH, ".//select[starts-with(@id,'seatType_')]")
+                    if seat_selects:
+                        passenger_rows.append(row)
+                
+                self.logger.info(f"收集到 {len(passenger_rows)} 个乘客行")
+                
+                # 如果收集到的行数少于乘客数，尝试其他方法
+                if len(passenger_rows) < len(passengers):
+                    # 备选：查找包含乘客姓名输入的行
+                    for row in all_rows:
+                        name_inputs = row.find_elements(By.XPATH, ".//input[@placeholder='姓名' or contains(@name,'name')]")
+                        if name_inputs:
+                            if row not in passenger_rows:
+                                passenger_rows.append(row)
+                
+                self.logger.info(f"最终收集到 {len(passenger_rows)} 个可用乘客行")
+                
+            except Exception as e:
+                self.logger.warning(f"收集乘客行失败: {e}")
+        else:
+            # 全局查找
+            try:
+                rows = self.driver.find_elements(By.XPATH, "//tr[.//select[starts-with(@id,'seatType_')]]")
+                passenger_rows.extend(rows)
+                self.logger.info(f"全局收集到 {len(passenger_rows)} 个乘客行")
+            except Exception as e:
+                self.logger.warning(f"全局收集乘客行失败: {e}")
+        
+        return passenger_rows
+
+    def _set_for_passenger_row_with_index(self, p: Passenger, wait: WebDriverWait, table, index: int, passenger_rows: List[Any]) -> bool:
+        """使用索引为乘客分配对应的行并设置席次"""
+        row = None
+        
+        # 策略1：尝试通过姓名精确匹配
+        if table:
+            try:
+                name_rows = table.find_elements(By.XPATH, f".//tr[.//*[contains(text(), '{p.name}')]]")
+                for r in name_rows:
+                    if p.name in r.text:
+                        row = r
+                        self.logger.info(f"通过姓名精确匹配定位到乘客行: {p.name} (索引{index})")
+                        break
+            except Exception as e:
+                self.logger.debug(f"通过姓名精确匹配失败: {e}")
+        
+        # 策略2：如果姓名匹配失败，使用索引映射
+        if not row and passenger_rows and index < len(passenger_rows):
+            row = passenger_rows[index]
+            self.logger.info(f"通过索引映射分配乘客行: {p.name} -> 行{index+1}")
+        
+        # 策略3：全局查找作为最后备选
+        if not row:
+            try:
+                global_rows = self.driver.find_elements(By.XPATH, f"//tr[.//*[contains(text(), '{p.name}')]]")
+                for r in global_rows:
+                    if p.name in r.text:
+                        row = r
+                        self.logger.info(f"全局定位到乘客行: {p.name} (索引{index})")
+                        break
+            except Exception as e:
+                self.logger.debug(f"全局定位失败: {e}")
+        
+        if not row:
+            self.logger.error(f"无法为乘客 {p.name} (索引{index}) 分配对应的行")
+            return False
+        
+        # 验证行是否包含必需的席次选择下拉框
+        try:
+            seat_select = row.find_element(By.XPATH, ".//select[starts-with(@id,'seatType_')]")
+            self.logger.debug(f"验证乘客行 {p.name} 包含席次选择下拉框: {seat_select.get_attribute('id')}")
+        except Exception as e:
+            self.logger.warning(f"乘客行 {p.name} 缺少席次选择下拉框: {e}")
+            # 尝试查找其他类型的下拉框
+            try:
+                selects = row.find_elements(By.XPATH, ".//select")
+                if selects:
+                    self.logger.info(f"乘客行 {p.name} 找到 {len(selects)} 个下拉框，将尝试使用")
+                else:
+                    self.logger.error(f"乘客行 {p.name} 没有找到任何下拉框")
+                    return False
+            except Exception:
+                self.logger.error(f"乘客行 {p.name} 下拉框检查失败")
+                return False
+        
+        self._scroll_into_view(row)
+        time.sleep(0.3)
+        
+        # 设置票种和席别
+        ticket_ok = True
+        if getattr(p, "ticket_type", None):
+            ticket_ok = self._set_ticket_type_in_row(row, p, wait)
+            if not ticket_ok:
+                self.logger.warning(f"设置票种失败: {p.name} -> {p.ticket_type}")
+        
+        seat_ok = True
+        if getattr(p, "seat_type", None):
+            seat_ok = self._set_seat_type_in_row(row, p, wait)
+            if not seat_ok:
+                self.logger.warning(f"设置席别失败: {p.name} -> {p.seat_type}")
+        
+        return ticket_ok and seat_ok
+
+    def _set_for_passenger_row(self, p: Passenger, wait: WebDriverWait, table) -> bool:
+        """在per-ticket表格中定位乘客行并设置席次"""
+        # 定位乘客行 - 基于表格结构
+        row = None
+        
+        if table:
+            # 在per-ticket表格内查找乘客行
+            try:
+                # 方法1: 通过乘客姓名查找行
+                name_rows = table.find_elements(By.XPATH, f".//tr[.//*[contains(text(), '{p.name}')]]")
+                for r in name_rows:
+                    if p.name in r.text:
+                        row = r
+                        self.logger.info(f"通过姓名定位到乘客行: {p.name}")
+                        break
+            except Exception as e:
+                self.logger.debug(f"通过姓名定位乘客行失败: {e}")
+            
+            # 方法2: 如果有表格，按行索引查找（假设按添加顺序）
+            if not row:
+                try:
+                    all_rows = table.find_elements(By.XPATH, ".//tr")
+                    # 找到包含输入框的行（乘客信息行）
+                    passenger_rows = [r for r in all_rows if r.find_elements(By.XPATH, ".//input")]
+                    if passenger_rows:
+                        # 简单策略：使用第一个可用行或按某种逻辑选择
+                        row = passenger_rows[0]
+                        self.logger.info(f"通过表格结构定位到乘客行: {p.name}")
+                except Exception as e:
+                    self.logger.debug(f"通过表格结构定位乘客行失败: {e}")
+        else:
+            # 全局查找 - 备选方案
+            try:
+                rows = self.driver.find_elements(By.XPATH, f"//tr[.//*[contains(text(), '{p.name}')]]")
+                for r in rows:
+                    if p.name in r.text:
+                        row = r
+                        self.logger.info(f"全局定位到乘客行: {p.name}")
+                        break
+            except Exception as e:
+                self.logger.debug(f"全局定位乘客行失败: {e}")
+        
+        if not row:
+            self.logger.warning(f"未找到乘客行: {p.name}")
+            return False
+        
+        self._scroll_into_view(row)
+        time.sleep(0.3)
+        
+        # 设置票种和席别
+        ticket_ok = True
+        if getattr(p, "ticket_type", None):
+            ticket_ok = self._set_ticket_type_in_row(row, p, wait)
+            if not ticket_ok:
+                self.logger.warning(f"设置票种失败: {p.name} -> {p.ticket_type}")
+        
+        seat_ok = True
+        if getattr(p, "seat_type", None):
+            seat_ok = self._set_seat_type_in_row(row, p, wait)
+            if not seat_ok:
+                self.logger.warning(f"设置席别失败: {p.name} -> {p.seat_type}")
+        
+        return ticket_ok and seat_ok
+
+    def _set_seat_type_in_row(self, row, p: Passenger, wait: WebDriverWait) -> bool:
+        """基于per-ticket表格的席次选择 - 增强版本"""
+        # 目标席别文本
+        if hasattr(p.seat_type, "value"):
+            seat_value = p.seat_type.value
+        else:
+            seat_value = str(p.seat_type or "")
+        seat_texts = self._normalize_seat_texts(seat_value)
+        
+        # 根据HTML分析，优先在per-ticket表格内通过ID定位席次选择下拉框
+        # 格式: seatType_1, seatType_2, seatType_3 等
+        try:
+            # 在当前行内查找席次选择下拉框，优先使用ID定位
+            seat_select = row.find_element(By.XPATH, ".//select[starts-with(@id,'seatType_')]")
+            opts = seat_select.find_elements(By.TAG_NAME, "option")
+            
+            # 记录可用选项用于调试
+            available_options = [opt.text.strip() for opt in opts]
+            self.logger.debug(f"席次选择下拉框选项: {available_options}")
+            
+            for t in seat_texts:
+                match = None
+                for o in opts:
+                    tx = o.text.strip()
+                    # 精确匹配或包含匹配
+                    if tx == t or (t and t in tx):
+                        match = tx
+                        break
+                
+                if match:
+                    try:
+                        Select(seat_select).select_by_visible_text(match)
+                        self.logger.info(f"席次选择成功(表格内): {p.name} -> {match}")
+                        time.sleep(0.3)
+                        return True
+                    except Exception as select_e:
+                        self.logger.warning(f"席次选择操作失败: {select_e}")
+                        continue
+            else:
+                self.logger.warning(f"在席次下拉框中未找到匹配项: {seat_texts}, 可用选项: {available_options}")
+        except Exception as e:
+            self.logger.debug(f"通过ID定位席次下拉框失败: {e}")
+        
+        # 备选方案1：在行内查找所有select元素并智能识别
+        try:
+            selects = row.find_elements(By.XPATH, ".//select")
+            for i, sel in enumerate(selects):
+                opts = sel.find_elements(By.TAG_NAME, "option")
+                opt_texts = [o.text.strip() for o in opts]
+                
+                # 检查是否是席次选择框（包含席次相关选项）
+                if any(any(seat in opt for seat in ["座", "卧", "商务", "一等", "二等", "硬", "软"]) for opt in opt_texts):
+                    self.logger.debug(f"发现备选席次选择框{i+1}，选项: {opt_texts}")
+                    
+                    for t in seat_texts:
+                        match = None
+                        for o in opts:
+                            tx = o.text.strip()
+                            if tx == t or (t and t in tx):
+                                match = tx
+                                break
+                        if match:
+                            try:
+                                Select(sel).select_by_visible_text(match)
+                                self.logger.info(f"席次选择成功(备选框{i+1}): {p.name} -> {match}")
+                                time.sleep(0.3)
+                                return True
+                            except Exception as select_e:
+                                self.logger.warning(f"备选席次选择操作失败: {select_e}")
+                                continue
+        except Exception as e:
+            self.logger.debug(f"备选席次选择框查找失败: {e}")
+        
+        # 备选方案2：在整个per-ticket表格内查找席次选择
+        try:
+            if hasattr(row, 'find_element'):
+                # 向上查找per-ticket表格
+                per_ticket_table = row.find_element(By.XPATH, "./ancestor::table[@class='per-ticket']")
+                seat_selects = per_ticket_table.find_elements(By.XPATH, ".//select[starts-with(@id,'seatType_')]")
+                
+                for sel in seat_selects:
+                    opts = sel.find_elements(By.TAG_NAME, "option")
+                    opt_texts = [o.text.strip() for o in opts]
+                    
+                    for t in seat_texts:
+                        match = None
+                        for o in opts:
+                            tx = o.text.strip()
+                            if tx == t or (t and t in tx):
+                                match = tx
+                                break
+                        if match:
+                            try:
+                                Select(sel).select_by_visible_text(match)
+                                self.logger.info(f"席次选择成功(表格范围): {p.name} -> {match}")
+                                time.sleep(0.3)
+                                return True
+                            except Exception as select_e:
+                                self.logger.warning(f"表格范围席次选择失败: {select_e}")
+                                continue
+        except Exception as e:
+            self.logger.debug(f"表格范围席次查找失败: {e}")
+        
+        # 备选方案3：尝试原有的"选座喽"弹窗方案
+        try:
+            # 检查是否存在选座弹窗
+            seat_widgets = self.driver.find_elements(By.XPATH, "//*[contains(normalize-space(),'选座喽') or contains(normalize-space(),'席别选择')]")
+            if seat_widgets:
+                self.logger.info("发现选座弹窗，尝试弹窗选择方案")
+                return self._original_seat_selection_method(p, wait)
+        except Exception as e:
+            self.logger.debug(f"弹窗选择方案检查失败: {e}")
+        
+        self.logger.error(f"席次选择失败，所有方案都尝试过了: {p.name} -> {seat_texts}")
+        return False
+
+    def _original_seat_selection_method(self, p: Passenger, wait: WebDriverWait) -> bool:
+        """原有的选座弹窗方法 - 作为备用方案"""
+        try:
+            # 查找选座弹窗
+            widget = self.driver.find_element(By.XPATH, "//*[contains(normalize-space(),'选座喽')]")
+            self._scroll_into_view(widget)
+            
+            # 目标席别文本
+            if hasattr(p.seat_type, "value"):
+                seat_value = p.seat_type.value
+            else:
+                seat_value = str(p.seat_type or "")
+            seat_texts = self._normalize_seat_texts(seat_value)
+            
+            # 尝试点击匹配的席别按钮
+            for t in seat_texts:
+                try:
+                    btn = widget.find_element(By.XPATH, f".//*[normalize-space(text())='{t}']")
+                    if btn.is_displayed() and btn.is_enabled():
+                        self._safe_click(btn)
+                        self.logger.info(f"席次选择成功(弹窗): {p.name} -> {t}")
+                        time.sleep(0.3)
+                        
+                        # 如果需要铺位选择
+                        if hasattr(p, "bunk_type") and p.bunk_type:
+                            return self._original_bunk_selection_method(p, wait)
+                        
+                        return True
+                except Exception:
+                    continue
+            
+            return False
+        except Exception as e:
+            self.logger.debug(f"原有选座方法失败: {e}")
+            return False
+
+    def _original_bunk_selection_method(self, p: Passenger, wait: WebDriverWait) -> bool:
+        """原有的铺位选择方法 - 作为备用方案"""
+        try:
+            pos = p.bunk_type.value if hasattr(p, "bunk_type") and p.bunk_type else None
+            if not pos:
+                return False
+            
+            # 查找铺位选择弹窗
+            widget = self.driver.find_element(By.XPATH, "//*[contains(normalize-space(),'选铺喽')]")
+            self._scroll_into_view(widget)
+            
+            # 尝试点击匹配的铺位按钮
+            candidates = []
+            if pos in ("下铺", "中铺", "上铺"):
+                candidates = [pos]
+            
+            for candidate in candidates:
+                try:
+                    btn = widget.find_element(By.XPATH, f".//*[normalize-space(text())='{candidate}']")
+                    if btn.is_displayed() and btn.is_enabled():
+                        self._safe_click(btn)
+                        self.logger.info(f"铺位选择成功(弹窗): {p.name} -> {candidate}")
+                        time.sleep(0.3)
+                        return True
+                except Exception:
+                    continue
+            
+            return False
+        except Exception as e:
+            self.logger.debug(f"原有铺位选择方法失败: {e}")
+            return False
+
+    def _set_ticket_type_in_row(self, row, p: Passenger, wait: WebDriverWait) -> bool:
+        t_texts = self._normalize_ticket_texts(getattr(p, "ticket_type", "成人票"))
+        
+        # 1) 原生 select
+        selects = row.find_elements(By.XPATH, ".//select")
+        for sel in selects:
+            try:
+                opts = sel.find_elements(By.TAG_NAME, "option")
+                if not any(("票" in (o.text or "")) or (o.text or "").strip() in ("成人", "儿童", "学生", "残军") for o in opts):
+                    continue
+                
+                for t in t_texts:
+                    try:
+                        all_opts = [o.text.strip() for o in opts]
+                        if t in all_opts:
+                            Select(sel).select_by_visible_text(t)
+                            time.sleep(0.2)
+                            return True
+                        # 兼容不带"票"的文本
+                        t_alt = t[:-1] if t.endswith("票") else t + "票"
+                        if t_alt in all_opts:
+                            Select(sel).select_by_visible_text(t_alt)
+                            time.sleep(0.2)
+                            return True
+                    except Exception:
+                        continue
+            except Exception:
+                continue
+        
+        # 2) el-select
+        try:
+            trigger = row.find_element(By.XPATH, ".//*[contains(@class,'el-select')]")
+            self._safe_click(trigger)
+            panel = wait.until(EC.visibility_of_element_located(
+                (By.XPATH, "//div[contains(@class,'el-select-dropdown') and not(contains(@style,'display: none'))]")
+            ))
+            for t in t_texts:
+                try:
+                    opt = panel.find_element(By.XPATH, f".//li//*[normalize-space(text())='{t}']")
+                    self._safe_click(opt)
+                    time.sleep(0.2)
+                    return True
+                except NoSuchElementException:
+                    t_alt = t[:-1] if t.endswith("票") else t + "票"
+                    try:
+                        opt = panel.find_element(By.XPATH, f".//li//*[normalize-space(text())='{t_alt}']")
+                        self._safe_click(opt)
+                        time.sleep(0.2)
+                        return True
+                    except NoSuchElementException:
+                        continue
+        except Exception:
+            pass
+        
+        return False
+
+    def _pick_seat_position_for_passenger(self, p: Passenger, wait: WebDriverWait) -> bool:
+        """铺位/座位位置选择 - 基于per-ticket表格的增强实现"""
+        try:
+            pos = None
+            if hasattr(p, "bunk_type") and getattr(p, "bunk_type", None) and hasattr(p.bunk_type, "value"):
+                pos = p.bunk_type.value
+            elif hasattr(p, "seat_pos") and getattr(p, "seat_pos", None):
+                pos = str(p.seat_pos)
+            if not pos:
+                return False
+            
+            pos = pos.strip()
+            self.logger.debug(f"开始铺位选择: {p.name} -> {pos}")
+            
+            # 方案1：在per-ticket表格内通过ID定位铺位选择下拉框
+            # 根据HTML分析，铺位选择可能通过ticketype_X下拉框实现
+            try:
+                # 优先在per-ticket表格内查找铺位选择下拉框
+                per_ticket_tables = self.driver.find_elements(By.XPATH, "//table[@class='per-ticket']")
+                
+                for table in per_ticket_tables:
+                    bunk_selects = table.find_elements(By.XPATH, ".//select[starts-with(@id,'ticketype_')]")
+                    
+                    for sel in bunk_selects:
+                        opts = sel.find_elements(By.TAG_NAME, "option")
+                        opt_texts = [o.text.strip() for o in opts]
+                        
+                        self.logger.debug(f"发现铺位选择下拉框，选项: {opt_texts}")
+                        
+                        # 检查是否包含铺位选项
+                        if any("铺" in opt for opt in opt_texts):
+                            # 根据铺位偏好进行选择
+                            if pos == "下铺" and any("下铺" in opt for opt in opt_texts):
+                                try:
+                                    Select(sel).select_by_visible_text("下铺")
+                                    self.logger.info(f"铺位选择成功(表格内): {p.name} -> 下铺")
+                                    return True
+                                except Exception as select_e:
+                                    self.logger.warning(f"下铺选择失败: {select_e}")
+                            elif pos == "中铺" and any("中铺" in opt for opt in opt_texts):
+                                try:
+                                    Select(sel).select_by_visible_text("中铺")
+                                    self.logger.info(f"铺位选择成功(表格内): {p.name} -> 中铺")
+                                    return True
+                                except Exception as select_e:
+                                    self.logger.warning(f"中铺选择失败: {select_e}")
+                            elif pos == "上铺" and any("上铺" in opt for opt in opt_texts):
+                                try:
+                                    Select(sel).select_by_visible_text("上铺")
+                                    self.logger.info(f"铺位选择成功(表格内): {p.name} -> 上铺")
+                                    return True
+                                except Exception as select_e:
+                                    self.logger.warning(f"上铺选择失败: {select_e}")
+                            else:
+                                # 默认选择"不限"
+                                if any("不限" in opt for opt in opt_texts):
+                                    try:
+                                        Select(sel).select_by_visible_text("不限")
+                                        self.logger.info(f"铺位选择默认(表格内): {p.name} -> 不限")
+                                        return True
+                                    except Exception as select_e:
+                                        self.logger.warning(f"默认铺位选择失败: {select_e}")
+            except Exception as e:
+                self.logger.debug(f"表格内铺位下拉框选择失败: {e}")
+            
+            # 方案2：全局查找铺位选择下拉框
+            try:
+                bunk_selects = self.driver.find_elements(By.XPATH, "//select[starts-with(@id,'ticketype_')]")
+                
+                for sel in bunk_selects:
+                    opts = sel.find_elements(By.TAG_NAME, "option")
+                    opt_texts = [o.text.strip() for o in opts]
+                    
+                    if any("铺" in opt for opt in opt_texts):
+                        if pos == "下铺" and any("下铺" in opt for opt in opt_texts):
+                            try:
+                                Select(sel).select_by_visible_text("下铺")
+                                self.logger.info(f"铺位选择成功(全局): {p.name} -> 下铺")
+                                return True
+                            except Exception as select_e:
+                                self.logger.warning(f"全局下铺选择失败: {select_e}")
+                        elif pos == "中铺" and any("中铺" in opt for opt in opt_texts):
+                            try:
+                                Select(sel).select_by_visible_text("中铺")
+                                self.logger.info(f"铺位选择成功(全局): {p.name} -> 中铺")
+                                return True
+                            except Exception as select_e:
+                                self.logger.warning(f"全局中铺选择失败: {select_e}")
+                        elif pos == "上铺" and any("上铺" in opt for opt in opt_texts):
+                            try:
+                                Select(sel).select_by_visible_text("上铺")
+                                self.logger.info(f"铺位选择成功(全局): {p.name} -> 上铺")
+                                return True
+                            except Exception as select_e:
+                                self.logger.warning(f"全局上铺选择失败: {select_e}")
+                        else:
+                            if any("不限" in opt for opt in opt_texts):
+                                try:
+                                    Select(sel).select_by_visible_text("不限")
+                                    self.logger.info(f"铺位选择默认(全局): {p.name} -> 不限")
+                                    return True
+                                except Exception as select_e:
+                                    self.logger.warning(f"全局默认铺位选择失败: {select_e}")
+            except Exception as e:
+                self.logger.debug(f"全局铺位下拉框选择失败: {e}")
+            
+            # 备选方案：查找"选座喽"或"选铺喽"小部件
+            try:
+                widget = self.driver.find_element(By.XPATH, "//*[contains(normalize-space(),'选座喽') or contains(normalize-space(),'选铺喽')]")
+                self._scroll_into_view(widget)
+                
+                candidates = []
+                if pos in ("A", "B", "C", "D", "F"):
+                    candidates = [pos]
+                elif pos in ("靠窗", "窗"):
+                    candidates = ["A", "F"]
+                elif pos in ("过道", "走道"):
+                    candidates = ["C", "D"]
+                elif pos in ("下铺", "中铺", "上铺"):
+                    candidates = [pos]
+                
+                for t in candidates:
+                    try:
+                        btn = widget.find_element(By.XPATH, f".//*[normalize-space(text())='{t}']")
+                        self._safe_click(btn)
+                        time.sleep(0.1)
+                        self.logger.info(f"位置选择成功(弹窗): {p.name} -> {t}")
+                        return True
+                    except NoSuchElementException:
+                        continue
+            except Exception as e:
+                self.logger.debug(f"弹窗位置选择失败: {e}")
+            
+            # 最后尝试：在全局范围内查找铺位选项
+            try:
+                bunk_options = {
+                    "下铺": ["下铺", "下"],
+                    "中铺": ["中铺", "中"], 
+                    "上铺": ["上铺", "上"],
+                    "靠窗": ["A", "F", "窗", "靠窗"],
+                    "过道": ["C", "D", "过道", "走道"]
+                }
+                
+                if pos in bunk_options:
+                    for option in bunk_options[pos]:
+                        try:
+                            elements = self.driver.find_elements(By.XPATH, f"//*[normalize-space(text())='{option}']")
+                            for el in elements:
+                                if el.is_displayed() and el.is_enabled():
+                                    self._safe_click(el)
+                                    time.sleep(0.1)
+                                    self.logger.info(f"铺位选择成功(全局): {p.name} -> {option}")
+                                    return True
+                        except Exception:
+                            continue
+            except Exception as e:
+                self.logger.debug(f"全局铺位选择失败: {e}")
+            
+            self.logger.warning(f"铺位选择失败: {p.name} -> {pos}")
+            return False
+            
+        except Exception as e:
+            self.logger.error(f"铺位选择异常: {e}")
+            return False
+
     def take_screenshot(self, filename: str) -> bool:
-        """截图"""
         try:
             if self.driver:
                 self.driver.save_screenshot(filename)
                 self.logger.info(f"截图保存到: {filename}")
                 return True
+            return False
         except Exception as e:
             self.logger.error(f"截图失败: {e}")
-        return False
-    
+            return False
+
     def get_status(self) -> Dict[str, Any]:
-        """获取当前状态"""
         return {
             "status": self.status.value,
             "error_message": self.error_message,
-            "is_running": self.status in [BookingStatus.SEARCHING, BookingStatus.SELECTING_TRAIN, 
-                                         BookingStatus.SELECTING_SEATS, BookingStatus.SUBMITTING_ORDER,
-                                         BookingStatus.CONFIRMING_PAYMENT]
+            "is_running": self.status in [
+                BookingStatus.SEARCHING,
+                BookingStatus.SELECTING_TRAIN,
+                BookingStatus.SELECTING_SEATS,
+                BookingStatus.SUBMITTING_ORDER,
+                BookingStatus.CONFIRMING_PAYMENT,
+            ]
         }
-    
+
     def cancel_booking(self) -> None:
-        """取消预订"""
         self.status = BookingStatus.CANCELLED
         self.logger.info("预订已取消")
-    
+
     def close(self) -> None:
-        """关闭浏览器"""
         if self.driver:
             try:
                 self.driver.quit()

@@ -31,23 +31,13 @@ class BunkType(Enum):
 class Passenger:
     """乘客信息 - 适配12306自动购票系统"""
     name: str
-    id_type: str = "二代身份证"
-    id_number: str = ""
-    mobile: str = ""
-    email: str = ""
-    seat_type: SeatType = SeatType.SECOND_CLASS
-    bunk_type: Optional[BunkType] = None
-    ticket_type: str = "成人票"
+    id_number: str = ""  # 身份证号用于12306验证
     passenger_type: str = "成人"
     
     def __post_init__(self):
         """初始化后验证，确保关键字段不为空"""
         if not self.name or not self.name.strip():
             raise ValueError("乘客姓名不能为空")
-        if not self.seat_type:
-            self.seat_type = SeatType.SECOND_CLASS
-        if not self.ticket_type or not self.ticket_type.strip():
-            self.ticket_type = "成人票"
         if not self.passenger_type or not self.passenger_type.strip():
             self.passenger_type = "成人"
     
@@ -55,77 +45,95 @@ class Passenger:
         """转换为字典格式"""
         result = {
             "name": self.name,
-            "id_type": self.id_type,
             "id_number": self.id_number,
-            "mobile": self.mobile,
-            "email": self.email,
-            "ticket_type": self.ticket_type,
             "passenger_type": self.passenger_type,
-            "seat_type": self.seat_type.value,
         }
-        if self.bunk_type:
-            result["bunk_type"] = self.bunk_type.value
         return result
     
     def get_booking_info(self) -> Dict[str, Any]:
         """获取自动购票所需的信息"""
         return {
             "name": self.name,
-            "seat_type": self.seat_type,
-            "ticket_type": self.ticket_type,
-            "bunk_type": self.bunk_type,
             "passenger_type": self.passenger_type,
-            "id_number": self.id_number,
-            "mobile": self.mobile
+            "id_number": self.id_number
         }
     
     def has_valid_booking_info(self) -> bool:
         """检查是否有有效的购票信息"""
         return bool(
             self.name and self.name.strip() and
-            self.seat_type and
-            self.ticket_type and self.ticket_type.strip() and
+            self.passenger_type and self.passenger_type.strip() and
             self.id_number and self.id_number.strip()
         )
-    
-    def get_seat_display_name(self) -> str:
-        """获取席次显示名称"""
-        if hasattr(self.seat_type, 'value'):
-            return self.seat_type.value
-        return str(self.seat_type or "二等座")
-    
-    def get_bunk_display_name(self) -> str:
-        """获取铺位显示名称"""
-        if self.bunk_type and hasattr(self.bunk_type, 'value'):
-            return self.bunk_type.value
-        return "无"
-    
-    def needs_bunk_selection(self) -> bool:
-        """检查是否需要选择铺位"""
-        if not self.seat_type:
-            return False
-        seat_name = self.get_seat_display_name()
-        return "卧" in seat_name and not self.bunk_type
     
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Passenger':
         """从字典创建乘客对象"""
+        return cls(
+            name=data["name"],
+            id_number=data.get("id_number", ""),
+            passenger_type=data.get("passenger_type", "成人")
+        )
+
+
+@dataclass
+class TicketPassenger:
+    """车票中的乘客信息（包含席次和铺位信息）"""
+    passenger: Passenger
+    seat_type: SeatType
+    bunk_type: Optional[BunkType] = None
+    ticket_type: str = "成人票"
+    
+    def __post_init__(self):
+        """初始化后验证"""
+        if not self.seat_type:
+            self.seat_type = SeatType.SECOND_CLASS
+        if not self.ticket_type or not self.ticket_type.strip():
+            self.ticket_type = "成人票"
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """转换为字典格式"""
+        result = {
+            "name": self.passenger.name,
+            "id_number": self.passenger.id_number,
+            "passenger_type": self.passenger.passenger_type,
+            "ticket_type": self.ticket_type,
+            "seat_type": self.seat_type.value,
+        }
+        if self.bunk_type:
+            result["bunk_type"] = self.bunk_type.value
+        return result
+    
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'TicketPassenger':
+        """从字典创建车票乘客对象"""
+        passenger = Passenger(
+            name=data["name"],
+            id_number=data.get("id_number", ""),
+            passenger_type=data.get("passenger_type", "成人")
+        )
+        
         seat_type = SeatType(data.get("seat_type", "二等座"))
         bunk_type = None
         if "bunk_type" in data:
             bunk_type = BunkType(data["bunk_type"])
         
         return cls(
-            name=data["name"],
-            id_type=data.get("id_type", "二代身份证"),
-            id_number=data.get("id_number", ""),
-            mobile=data.get("mobile", ""),
-            email=data.get("email", ""),
+            passenger=passenger,
             seat_type=seat_type,
             bunk_type=bunk_type,
-            ticket_type=data.get("ticket_type", "成人票"),
-            passenger_type=data.get("passenger_type", "成人")
+            ticket_type=data.get("ticket_type", "成人票")
         )
+    
+    def get_booking_info(self) -> Dict[str, Any]:
+        """获取自动购票所需的信息"""
+        return {
+            "name": self.passenger.name,
+            "seat_type": self.seat_type,
+            "ticket_type": self.ticket_type,
+            "bunk_type": self.bunk_type,
+            "id_number": self.passenger.id_number
+        }
 
 
 @dataclass
@@ -161,7 +169,7 @@ class TrainInfo:
 class TicketInfo:
     """车票信息（支持多个乘客的不同席次选择）"""
     train_info: TrainInfo
-    passengers: List[Passenger] = field(default_factory=list)
+    ticket_passengers: List[TicketPassenger] = field(default_factory=list)
     
     def __post_init__(self):
         """初始化后验证"""
@@ -172,54 +180,59 @@ class TicketInfo:
         """转换为字典格式"""
         return {
             "train_info": self.train_info.to_dict(),
-            "passengers": [passenger.to_dict() for passenger in self.passengers]
+            "passengers": [tp.to_dict() for tp in self.ticket_passengers]
         }
     
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'TicketInfo':
         """从字典创建车票信息对象"""
         train_info = TrainInfo.from_dict(data["train_info"])
-        passengers = [Passenger.from_dict(p) for p in data["passengers"]]
-        return cls(train_info=train_info, passengers=passengers)
+        ticket_passengers = [TicketPassenger.from_dict(p) for p in data["passengers"]]
+        return cls(train_info=train_info, ticket_passengers=ticket_passengers)
     
-    def add_passenger(self, passenger: Passenger) -> None:
-        """添加乘客"""
-        if passenger.has_valid_booking_info():
-            self.passengers.append(passenger)
+    def add_ticket_passenger(self, ticket_passenger: TicketPassenger) -> None:
+        """添加车票乘客"""
+        if ticket_passenger.passenger.has_valid_booking_info():
+            self.ticket_passengers.append(ticket_passenger)
         else:
             raise ValueError("乘客信息不完整，无法添加")
     
-    def remove_passenger(self, index: int) -> None:
-        """移除乘客"""
-        if 0 <= index < len(self.passengers):
-            self.passengers.pop(index)
+    @property
+    def passengers(self) -> List[Passenger]:
+        """获取基础乘客信息列表（向后兼容）"""
+        return [tp.passenger for tp in self.ticket_passengers]
     
-    def update_passenger(self, index: int, passenger: Passenger) -> None:
-        """更新乘客信息"""
-        if 0 <= index < len(self.passengers):
-            if passenger.has_valid_booking_info():
-                self.passengers[index] = passenger
+    def remove_ticket_passenger(self, index: int) -> None:
+        """移除车票乘客"""
+        if 0 <= index < len(self.ticket_passengers):
+            self.ticket_passengers.pop(index)
+    
+    def update_ticket_passenger(self, index: int, ticket_passenger: TicketPassenger) -> None:
+        """更新车票乘客信息"""
+        if 0 <= index < len(self.ticket_passengers):
+            if ticket_passenger.passenger.has_valid_booking_info():
+                self.ticket_passengers[index] = ticket_passenger
             else:
                 raise ValueError("乘客信息不完整，无法更新")
     
     def get_seat_types(self) -> List[SeatType]:
         """获取所有乘客选择的席次类型"""
-        return [passenger.seat_type for passenger in self.passengers]
+        return [tp.seat_type for tp in self.ticket_passengers]
     
     def has_conflicting_seat_types(self) -> bool:
         """检查是否存在席次冲突（用于逻辑验证）"""
-        if len(self.passengers) <= 1:
+        if len(self.ticket_passengers) <= 1:
             return False
         seat_types = self.get_seat_types()
         return len(set(seat_types)) > 1
     
     def get_booking_summary(self) -> Dict[str, Any]:
         """获取购票摘要信息"""
-        if not self.passengers:
+        if not self.ticket_passengers:
             return {"valid": False, "message": "没有乘客信息"}
         
         # 检查所有乘客信息是否有效
-        invalid_passengers = [p for p in self.passengers if not p.has_valid_booking_info()]
+        invalid_passengers = [tp for tp in self.ticket_passengers if not tp.passenger.has_valid_booking_info()]
         if invalid_passengers:
             return {
                 "valid": False, 
@@ -228,12 +241,12 @@ class TicketInfo:
         
         # 统计席次分布
         seat_distribution = {}
-        for passenger in self.passengers:
-            seat_name = passenger.get_seat_display_name()
+        for tp in self.ticket_passengers:
+            seat_name = tp.seat_type.value
             seat_distribution[seat_name] = seat_distribution.get(seat_name, 0) + 1
         
         # 检查是否需要铺位选择
-        needs_bunk = [p for p in self.passengers if p.needs_bunk_selection()]
+        needs_bunk = [tp for tp in self.ticket_passengers if "卧" in tp.seat_type.value and not tp.bunk_type]
         
         return {
             "valid": True,

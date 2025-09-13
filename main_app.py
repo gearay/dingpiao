@@ -190,14 +190,14 @@ class MainApp:
             return
         
         print(f"\n共有 {len(passengers)} 位乘客:")
-        print("-" * 80)
-        print(f"{'序号':<4} {'姓名':<10} {'身份证号':<20} {'手机号':<15} {'席次':<8} {'铺位':<6}")
-        print("-" * 80)
+        print("-" * 60)
+        print(f"{'序号':<4} {'姓名':<10} {'身份证号':<20} {'乘客类型':<8}")
+        print("-" * 60)
         
         for i, passenger in enumerate(passengers, 1):
-            bunk = passenger.bunk_type.value if passenger.bunk_type else "无"
-            print(f"{i:<4} {passenger.name:<10} {passenger.id_number:<20} "
-                  f"{passenger.mobile:<15} {passenger.seat_type.value:<8} {bunk:<6}")
+            print(f"{i:<4} {passenger.name:<10} {passenger.id_number:<20} {passenger.passenger_type:<8}")
+        
+        print("\n💡 提示: 席次和铺位信息在车票管理模块中设置")
     
     def add_passenger(self) -> None:
         """添加乘客"""
@@ -213,43 +213,23 @@ class MainApp:
             print("身份证号不能为空")
             return
         
-        mobile = input("手机号: ").strip()
-        email = input("邮箱: ").strip()
-        
-        # 选择席次
-        print("选择席次类型:")
-        seat_types = self.ticket_manager.get_available_seat_types()
-        for i, seat_type in enumerate(seat_types, 1):
-            print(f"{i}. {seat_type.value}")
+        # 选择乘客类型（简化为：成人，儿童，学生，残军）
+        print("选择乘客类型:")
+        passenger_types = ["成人", "儿童", "学生", "残军"]
+        for i, p_type in enumerate(passenger_types, 1):
+            print(f"{i}. {p_type}")
         
         try:
-            seat_choice = int(input("请选择席次 (1-{}): ".format(len(seat_types))))
-            seat_type = seat_types[seat_choice - 1]
+            type_choice = int(input("请选择乘客类型 (1-{}): ".format(len(passenger_types))))
+            passenger_type = passenger_types[type_choice - 1]
         except:
-            print("无效选择，使用默认席次")
-            seat_type = SeatType.SECOND_CLASS
-        
-        # 如果是卧铺，选择铺位
-        bunk_type = None
-        if "卧" in seat_type.value:
-            print("选择铺位类型:")
-            bunk_types = self.ticket_manager.get_available_bunk_types()
-            for i, bunk in enumerate(bunk_types, 1):
-                print(f"{i}. {bunk.value}")
-            
-            try:
-                bunk_choice = int(input("请选择铺位 (1-{}): ".format(len(bunk_types))))
-                bunk_type = bunk_types[bunk_choice - 1]
-            except:
-                print("无效选择，不选择铺位")
+            print("无效选择，使用默认类型")
+            passenger_type = "成人"
         
         passenger = Passenger(
             name=name,
             id_number=id_number,
-            mobile=mobile,
-            email=email,
-            seat_type=seat_type,
-            bunk_type=bunk_type
+            passenger_type=passenger_type
         )
         
         if self.ticket_manager.add_passenger(passenger):
@@ -273,56 +253,31 @@ class MainApp:
                 print(f"当前信息:")
                 print(f"姓名: {passenger.name}")
                 print(f"身份证号: {passenger.id_number}")
-                print(f"手机号: {passenger.mobile}")
-                print(f"邮箱: {passenger.email}")
-                print(f"席次: {passenger.seat_type.value}")
-                print(f"铺位: {passenger.bunk_type.value if passenger.bunk_type else '无'}")
+                print(f"乘客类型: {passenger.passenger_type}")
                 
                 # 输入新信息
                 name = input(f"姓名 [{passenger.name}]: ").strip()
                 if name:
                     passenger.name = name
                 
-                mobile = input(f"手机号 [{passenger.mobile}]: ").strip()
-                if mobile:
-                    passenger.mobile = mobile
+                id_number = input(f"身份证号 [{passenger.id_number}]: ").strip()
+                if id_number:
+                    passenger.id_number = id_number
                 
-                email = input(f"邮箱 [{passenger.email}]: ").strip()
-                if email:
-                    passenger.email = email
-                
-                # 编辑席次
-                print("选择新的席次类型:")
-                seat_types = self.ticket_manager.get_available_seat_types()
-                for i, seat_type in enumerate(seat_types, 1):
-                    print(f"{i}. {seat_type.value}")
-                    if seat_type == passenger.seat_type:
+                # 选择乘客类型
+                print("选择乘客类型:")
+                passenger_types = ["成人", "儿童", "学生", "残军"]
+                for i, p_type in enumerate(passenger_types, 1):
+                    print(f"{i}. {p_type}")
+                    if p_type == passenger.passenger_type:
                         print(f"   (当前选择)")
                 
                 try:
-                    seat_choice = int(input(f"请选择席次 (1-{len(seat_types)}, 当前为{passenger.seat_type.value}): "))
-                    if 1 <= seat_choice <= len(seat_types):
-                        passenger.seat_type = seat_types[seat_choice - 1]
+                    type_choice = int(input(f"请选择乘客类型 (1-{len(passenger_types)}, 当前为{passenger.passenger_type}): "))
+                    if 1 <= type_choice <= len(passenger_types):
+                        passenger.passenger_type = passenger_types[type_choice - 1]
                 except:
-                    print("无效选择，保持原席次")
-                
-                # 如果是卧铺，编辑铺位
-                if "卧" in passenger.seat_type.value:
-                    print("选择铺位类型:")
-                    bunk_types = self.ticket_manager.get_available_bunk_types()
-                    for i, bunk in enumerate(bunk_types, 1):
-                        print(f"{i}. {bunk.value}")
-                        if bunk == passenger.bunk_type:
-                            print(f"   (当前选择)")
-                    
-                    try:
-                        bunk_choice = int(input(f"请选择铺位 (1-{len(bunk_types)}, 当前为{passenger.bunk_type.value if passenger.bunk_type else '无'}): "))
-                        if 1 <= bunk_choice <= len(bunk_types):
-                            passenger.bunk_type = bunk_types[bunk_choice - 1]
-                    except:
-                        print("无效选择，保持原铺位")
-                else:
-                    passenger.bunk_type = None
+                    print("无效选择，保持原类型")
                 
                 if self.ticket_manager.update_passenger(index, passenger):
                     print("乘客信息更新成功")
@@ -368,13 +323,12 @@ class MainApp:
             return
         
         print(f"\n找到 {len(results)} 位匹配的乘客:")
-        print("-" * 80)
-        print(f"{'姓名':<10} {'身份证号':<20} {'手机号':<15} {'席次':<8}")
-        print("-" * 80)
+        print("-" * 50)
+        print(f"{'姓名':<10} {'身份证号':<20} {'乘客类型':<8}")
+        print("-" * 50)
         
         for passenger in results:
-            print(f"{passenger.name:<10} {passenger.id_number:<20} "
-                  f"{passenger.mobile:<15} {passenger.seat_type.value:<8}")
+            print(f"{passenger.name:<10} {passenger.id_number:<20} {passenger.passenger_type:<8}")
     
     def ticket_management(self) -> None:
         """车票管理"""
@@ -449,7 +403,7 @@ class MainApp:
         
         print("选择乘客:")
         for i, passenger in enumerate(passengers, 1):
-            print(f"{i}. {passenger.name} ({passenger.seat_type.value})")
+            print(f"{i}. {passenger.name} ({passenger.passenger_type})")
         
         selected_passengers = []
         while True:
@@ -465,8 +419,72 @@ class MainApp:
             except:
                 print("输入错误，请重试")
         
+        # 为每个乘客选择席次和铺位
+        ticket_passengers = []
+        for passenger in selected_passengers:
+            print(f"\n为乘客 {passenger.name} 选择席次和票种:")
+            
+            # 选择票种（基于乘客类型映射到具体票种）
+            print("选择票种:")
+            ticket_mapping = {
+                "成人": ["成人票"],
+                "儿童": ["儿童票"],
+                "学生": ["学生票"],
+                "残军": ["残军票"]
+            }
+            
+            available_tickets = ticket_mapping.get(passenger.passenger_type, ["成人票"])
+            for i, ticket in enumerate(available_tickets, 1):
+                print(f"{i}. {ticket}")
+            
+            try:
+                ticket_choice = int(input(f"请选择票种 (1-{len(available_tickets)}): ")) - 1
+                if 0 <= ticket_choice < len(available_tickets):
+                    ticket_type = available_tickets[ticket_choice]
+                else:
+                    ticket_type = available_tickets[0]
+            except:
+                ticket_type = available_tickets[0]
+            
+            # 选择席次
+            print("选择席次类型:")
+            seat_types = self.ticket_manager.get_available_seat_types()
+            for i, seat_type in enumerate(seat_types, 1):
+                print(f"{i}. {seat_type.value}")
+            
+            try:
+                seat_choice = int(input("请选择席次 (1-{}): ".format(len(seat_types))))
+                seat_type = seat_types[seat_choice - 1]
+            except:
+                print("无效选择，使用默认席次")
+                seat_type = SeatType.SECOND_CLASS
+            
+            # 如果是卧铺，选择铺位
+            bunk_type = None
+            if "卧" in seat_type.value:
+                print("选择铺位类型:")
+                bunk_types = self.ticket_manager.get_available_bunk_types()
+                for i, bunk in enumerate(bunk_types, 1):
+                    print(f"{i}. {bunk.value}")
+                
+                try:
+                    bunk_choice = int(input("请选择铺位 (1-{}): ".format(len(bunk_types))))
+                    bunk_type = bunk_types[bunk_choice - 1]
+                except:
+                    print("无效选择，不选择铺位")
+            
+            # 创建车票乘客对象
+            from models import TicketPassenger
+            ticket_passenger = TicketPassenger(
+                passenger=passenger,
+                seat_type=seat_type,
+                bunk_type=bunk_type,
+                ticket_type=ticket_type
+            )
+            ticket_passengers.append(ticket_passenger)
+        
         # 创建车票
-        ticket = self.ticket_manager.create_ticket(train_info, selected_passengers)
+        ticket = self.ticket_manager.create_ticket_with_ticket_passengers(train_info, ticket_passengers)
         print("车票创建成功")
     
     def edit_ticket(self) -> None:

@@ -76,7 +76,8 @@ class AutoBooking:
             self.error_message = str(e)
             return False
 
-    def open_browser_and_wait_for_login(self, from_station: str, to_station: str, departure_date: str) -> bool:
+    def open_browser_and_wait_for_login(self, from_station: str = None, to_station: str = None, departure_date: str = None) -> bool:
+        """打开浏览器并等待用户登录（移除车次查询功能）"""
         try:
             self.status = BookingStatus.WAITING_FOR_LOGIN
             if not self.driver and not self.init_driver():
@@ -87,7 +88,7 @@ class AutoBooking:
             self.driver.get(self.ticket_url)
             time.sleep(1.0)
 
-            self._fill_search_form(from_station, to_station, departure_date)
+            # 移除车次查询表单填充，只打开登录页面
             print("=" * 50)
             print("请在浏览器中完成登录，登录后本程序将继续。")
             print("=" * 50)
@@ -103,38 +104,76 @@ class AutoBooking:
             self.error_message = str(e)
             self.status = BookingStatus.FAILED
             return False
+    
+    def open_browser_for_login_only(self) -> bool:
+        """仅打开浏览器进行登录（无任何车次查询）"""
+        return self.open_browser_and_wait_for_login()
 
     def _fill_search_form(self, from_station: str, to_station: str, departure_date: str) -> None:
         try:
             wait = WebDriverWait(self.driver, self.wait_timeout)
+            self.logger.info("开始填充搜索表单...")
+            
             # 出发地
             from_input = wait.until(EC.element_to_be_clickable((By.ID, "fromStationText")))
             from_input.click()
-            time.sleep(0.2)
+            time.sleep(0.3)
+            
+            # 确保清空输入框
             from_input.clear()
-            from_input.send_keys(from_station)
             time.sleep(0.2)
+            
+            # 再次清空以确保完全清空
+            current_value = from_input.get_attribute('value')
+            if current_value:
+                from_input.clear()
+                time.sleep(0.2)
+                
+            from_input.send_keys(from_station)
+            time.sleep(0.3)
+            
             # 关闭下拉
             from_input.send_keys(Keys.ENTER)
-            time.sleep(0.2)
+            time.sleep(0.3)
 
             # 目的地
             to_input = wait.until(EC.element_to_be_clickable((By.ID, "toStationText")))
             to_input.click()
-            time.sleep(0.2)
+            time.sleep(0.3)
+            
+            # 确保清空输入框
             to_input.clear()
+            time.sleep(0.2)
+            
+            # 再次清空以确保完全清空
+            current_value = to_input.get_attribute('value')
+            if current_value:
+                to_input.clear()
+                time.sleep(0.2)
+                
             to_input.send_keys(to_station)
-            time.sleep(0.2)
+            time.sleep(0.3)
             to_input.send_keys(Keys.ENTER)
-            time.sleep(0.2)
+            time.sleep(0.3)
 
             # 日期
             date_input = wait.until(EC.element_to_be_clickable((By.ID, "train_date")))
             date_input.click()
-            time.sleep(0.2)
+            time.sleep(0.3)
+            
+            # 确保清空输入框
             date_input.clear()
-            date_input.send_keys(departure_date)
             time.sleep(0.2)
+            
+            # 再次清空以确保完全清空
+            current_value = date_input.get_attribute('value')
+            if current_value:
+                date_input.clear()
+                time.sleep(0.2)
+                
+            date_input.send_keys(departure_date)
+            time.sleep(0.3)
+            
             self.logger.info("搜索表单填充完成")
         except Exception as e:
             self.logger.error(f"填充搜索表单失败: {e}")
@@ -328,12 +367,18 @@ class AutoBooking:
     def auto_book_ticket(self, ticket_info: TicketInfo) -> bool:
         try:
             self.logger.info(f"开始自动预订: {ticket_info.train_info.train_number}")
-            if not self.open_browser_and_wait_for_login(
+            # 1. 打开浏览器并等待登录（不填充搜索表单）
+            if not self.open_browser_and_wait_for_login():
+                return False
+            
+            # 2. 登录成功后，填充搜索表单
+            self._fill_search_form(
                 ticket_info.train_info.departure_station,
                 ticket_info.train_info.arrival_station,
-                ticket_info.train_info.date,
-            ):
-                return False
+                ticket_info.train_info.date
+            )
+            
+            # 3. 搜索车票
             if not self.search_tickets():
                 return False
             if not self.select_train(ticket_info.train_info.train_number):

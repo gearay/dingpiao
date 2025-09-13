@@ -105,29 +105,18 @@ class TimedBooking:
         
         return logger
     
-    def pre_login(self, username: str, password: str, 
+    def pre_login(self, username: str = None, password: str = None, 
                   captcha_callback: Optional[Callable] = None) -> bool:
-        """预登录（现在改为打开浏览器等待人工登录）"""
+        """预登录（打开浏览器等待人工登录，无车次查询）"""
         try:
             self.logger.info("开始预登录")
-            # 获取一个示例车票信息来打开浏览器
-            tickets = self.ticket_manager.get_tickets()
-            if tickets:
-                # 使用第一个车票信息打开浏览器
-                ticket = tickets[0]
-                success = self.auto_booking.open_browser_and_wait_for_login(
-                    ticket.train_info.departure_station,
-                    ticket.train_info.arrival_station,
-                    ticket.train_info.date
-                )
-                if success:
-                    self.logger.info("预登录成功")
-                else:
-                    self.logger.error("预登录失败")
-                return success
+            # 直接打开浏览器进行登录，不需要车次信息
+            success = self.auto_booking.open_browser_for_login_only()
+            if success:
+                self.logger.info("预登录成功")
             else:
-                self.logger.error("没有可用的车票信息进行预登录")
-                return False
+                self.logger.error("预登录失败")
+            return success
         except Exception as e:
             self.logger.error(f"预登录异常: {e}")
             return False

@@ -562,41 +562,21 @@ class MainApp:
                 print("无效选择")
     
     def pre_login(self) -> None:
-        """预登录"""
+        """预登录（无车次查询）"""
         print("\n--- 预登录 ---")
-        
-        tickets = self.ticket_manager.get_tickets()
-        if not tickets:
-            print("请先创建车票信息")
-            return
-        
-        print("选择用于预登录的车票:")
-        for i, ticket in enumerate(tickets, 1):
-            print(f"{i}. {ticket.train_info.train_number} "
-                  f"{ticket.train_info.departure_station} -> {ticket.train_info.arrival_station} "
-                  f"{ticket.train_info.date}")
+        print("开始预登录...")
+        print("程序将打开浏览器，请完成登录后等待自动化操作...")
         
         try:
-            choice = int(input("请选择车票序号: ")) - 1
-            if 0 <= choice < len(tickets):
-                ticket = tickets[choice]
-                print("开始预登录...")
-                print("程序将打开浏览器，请完成登录后等待自动化操作...")
+            # 直接打开浏览器进行登录，不需要选择车票
+            success = self.auto_booking.open_browser_for_login_only()
                 
-                success = self.auto_booking.open_browser_and_wait_for_login(
-                    ticket.train_info.departure_station,
-                    ticket.train_info.arrival_station,
-                    ticket.train_info.date
-                )
-                
-                if success:
-                    print("预登录成功")
-                else:
-                    print("预登录失败")
+            if success:
+                print("预登录成功")
             else:
-                print("无效序号")
-        except:
-            print("输入错误")
+                print("预登录失败")
+        except Exception as e:
+            print(f"预登录异常: {e}")
     
     def book_ticket_now(self) -> None:
         """立即购票"""

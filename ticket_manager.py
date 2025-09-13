@@ -3,7 +3,7 @@ import os
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 
-from models import Passenger, TrainInfo, TicketInfo, SeatType, BunkType
+from models import Passenger, TrainInfo, TicketInfo, SeatType, BunkType, TicketPassenger
 
 
 class TicketManager:
@@ -120,14 +120,24 @@ class TicketManager:
         for passenger in self.passengers:
             if (keyword in passenger.name.lower() or 
                 keyword in passenger.id_number or
-                keyword in passenger.mobile):
+                keyword in passenger.passenger_type.lower()):
                 results.append(passenger)
         return results
     
     # 车票管理
     def create_ticket(self, train_info: TrainInfo, passengers: List[Passenger]) -> TicketInfo:
-        """创建车票信息"""
+        """创建车票信息（向后兼容）"""
         ticket = TicketInfo(train_info=train_info, passengers=passengers.copy())
+        self.tickets.append(ticket)
+        self._save_tickets()
+        return ticket
+    
+    def create_ticket_with_ticket_passengers(self, train_info: TrainInfo, ticket_passengers: List[TicketPassenger]) -> TicketInfo:
+        """创建车票信息（使用TicketPassenger对象）"""
+        from models import TicketInfo
+        ticket = TicketInfo(train_info=train_info)
+        for tp in ticket_passengers:
+            ticket.add_ticket_passenger(tp)
         self.tickets.append(ticket)
         self._save_tickets()
         return ticket
@@ -198,8 +208,6 @@ class TicketManager:
                 errors.append(f"乘客{i+1}姓名不能为空")
             if not passenger.id_number.strip():
                 errors.append(f"乘客{i+1}身份证号不能为空")
-            if not passenger.mobile.strip():
-                warnings.append(f"乘客{i+1}手机号为空")
         
         # 验证列车信息
         if not ticket.train_info.train_number.strip():
@@ -271,8 +279,8 @@ class TicketManager:
         """获取统计信息"""
         seat_type_count = {}
         for ticket in self.tickets:
-            for passenger in ticket.passengers:
-                seat_type = passenger.seat_type.value
+            for ticket_passenger in ticket.ticket_passengers:
+                seat_type = ticket_passenger.seat_type.value
                 seat_type_count[seat_type] = seat_type_count.get(seat_type, 0) + 1
         
         return {

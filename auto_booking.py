@@ -199,9 +199,15 @@ class AutoBooking:
             wait = WebDriverWait(self.driver, self.wait_timeout)
             for attempt in range(max_retries):
                 try:
+                    # 在点击查询按钮之前，先检查并处理dhx_modal_cover
+                    self._handle_dhx_modal_cover()
+                    
                     query_button = wait.until(EC.element_to_be_clickable((By.ID, "query_ticket")))
                     query_button.click()
                     time.sleep(0.05)  # 50ms for search response
+                    
+                    # 点击查询按钮后，再次检查并处理可能出现的dhx_modal_cover
+                    self._handle_dhx_modal_cover()
                     # 检查查询结果
                     rows = self.driver.find_elements(By.XPATH, "//tbody[@id='queryLeftTable']/tr[not(contains(@class,'tips'))]")
                     if rows:
@@ -210,6 +216,12 @@ class AutoBooking:
                     time.sleep(0.1)  # 100ms retry interval
                 except Exception as e:
                     self.logger.warning(f"第 {attempt+1} 次搜索异常: {e}")
+                    
+                    # 如果是元素点击被拦截的错误，尝试处理dhx_modal_cover遮罩层
+                    if "element click intercepted" in str(e).lower() and "dhx_modal_cover" in str(e):
+                        self.logger.info("检测到dhx_modal_cover遮挡问题，尝试处理...")
+                        self._handle_dhx_modal_cover()
+                    
                     time.sleep(0.1)  # 100ms retry interval
             return False
         except Exception as e:
@@ -222,6 +234,9 @@ class AutoBooking:
         try:
             self.status = BookingStatus.SELECTING_TRAIN
             time.sleep(0.05)  # 50ms for page stabilization
+            
+            # 在选择车次之前，先检查并处理dhx_modal_cover
+            self._handle_dhx_modal_cover()
             rows = self.driver.find_elements(By.XPATH, "//tbody[@id='queryLeftTable']/tr")
             for row in rows:
                 try:
@@ -339,6 +354,10 @@ class AutoBooking:
         try:
             self.status = BookingStatus.SUBMITTING_ORDER
             wait = WebDriverWait(self.driver, self.wait_timeout)
+            
+            # 在提交订单之前，先检查并处理dhx_modal_cover
+            self._handle_dhx_modal_cover()
+            
             btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[normalize-space(text())='提交订单']")))
             self._safe_click(btn)
             time.sleep(0.1)  # 100ms for faster operation
@@ -353,6 +372,10 @@ class AutoBooking:
         try:
             self.status = BookingStatus.CONFIRMING_PAYMENT
             wait = WebDriverWait(self.driver, self.wait_timeout)
+            
+            # 在确认订单之前，先检查并处理dhx_modal_cover
+            self._handle_dhx_modal_cover()
+            
             btn = wait.until(EC.element_to_be_clickable((By.ID, "qr_submit_id")))
             self._safe_click(btn)
             time.sleep(0.1)  # 100ms for order confirmation
@@ -620,6 +643,57 @@ class AutoBooking:
         
         return None
     
+    def _handle_dhx_modal_cover(self) -> bool:
+        """处理dhtmlx modal cover遮罩层"""
+        try:
+            # 检查是否有dhx_modal_cover遮罩层
+            modal_covers = self.driver.find_elements(By.XPATH, "//div[contains(@class,'dhx_modal_cover')]")
+            for cover in modal_covers:
+                if cover.is_displayed():
+                    self.logger.info("检测到dhx_modal_cover遮罩层，尝试关闭...")
+                    
+                    # 尝试点击遮罩层关闭
+                    try:
+                        cover.click()
+                        time.sleep(0.1)
+                        self.logger.info("成功点击关闭dhx_modal_cover遮罩层")
+                        return True
+                    except:
+                        pass
+                    
+                    # 尝试按ESC键关闭
+                    try:
+                        from selenium.webdriver.common.keys import Keys
+                        cover.send_keys(Keys.ESCAPE)
+                        time.sleep(0.1)
+                        self.logger.info("成功通过ESC键关闭dhx_modal_cover遮罩层")
+                        return True
+                    except:
+                        pass
+                    
+                    # 尝试执行JavaScript移除遮罩层
+                    try:
+                        self.driver.execute_script("arguments[0].remove();", cover)
+                        time.sleep(0.1)
+                        self.logger.info("成功通过JavaScript移除dhx_modal_cover遮罩层")
+                        return True
+                    except:
+                        pass
+                    
+                    # 尝试隐藏遮罩层
+                    try:
+                        self.driver.execute_script("arguments[0].style.display='none';", cover)
+                        time.sleep(0.1)
+                        self.logger.info("成功通过JavaScript隐藏dhx_modal_cover遮罩层")
+                        return True
+                    except:
+                        pass
+            
+            return False
+        except Exception as e:
+            self.logger.warning(f"处理dhx_modal_cover遮罩层失败: {e}")
+            return False
+    
     def _detect_overlay_dialog(self) -> dict:
         """检测遮罩层弹窗"""
         # 检查遮罩层
@@ -628,7 +702,8 @@ class AutoBooking:
             "//div[contains(@class,'el-overlay')]",
             "//div[contains(@class,'v-modal')]",
             "//div[contains(@class,'modal-backdrop')]",
-            "//div[contains(@class,'ui-widget-overlay')]"
+            "//div[contains(@class,'ui-widget-overlay')]",
+            "//div[contains(@class,'dhx_modal_cover')]"
         ]
         
         for pattern in overlay_patterns:

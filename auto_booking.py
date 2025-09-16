@@ -231,60 +231,136 @@ class AutoBooking:
             return False
 
     def select_train(self, train_number: str) -> bool:
-        try:
-            self.status = BookingStatus.SELECTING_TRAIN
-            time.sleep(0.05)  # 50ms for page stabilization
-            
-            # 在选择车次之前，先检查并处理dhx_modal_cover
-            self._handle_dhx_modal_cover()
-            rows = self.driver.find_elements(By.XPATH, "//tbody[@id='queryLeftTable']/tr")
-            for row in rows:
-                try:
-                    # 跳过无效行
-                    cls = row.get_attribute("class") or ""
-                    style = row.get_attribute("style") or ""
-                    if "btm" in cls or "display: none" in style:
-                        continue
-                    
-                    # 检查车次
-                    train_text = ""
+        """选择车次，如果车次不可预订则重新查询"""
+        max_query_retries = 5
+        
+        for retry in range(max_query_retries):
+            try:
+                self.status = BookingStatus.SELECTING_TRAIN
+                if retry > 0:
+                    self.logger.info(f"第{retry + 1}次尝试查询车次 {train_number}")
+                
+                # 在选择车次之前，先检查并处理dhx_modal_cover
+                self._handle_dhx_modal_cover()
+                
+                # 查找目标车次
+                train_found = False
+                book_button_found = False
+                
+                rows = self.driver.find_elements(By.XPATH, "//tbody[@id='queryLeftTable']/tr")
+                for row in rows:
                     try:
-                        train_td = row.find_element(By.XPATH, "./td[1]")
-                        train_text = train_td.text.strip()
-                    except Exception:
-                        pass
-                    
-                    if not train_text or train_number not in train_text:
-                        continue
-                    
-                    # 点击预订按钮
-                    book = row.find_elements(By.XPATH, ".//a[contains(text(),'预订')]")
-                    for b in book:
-                        if b.is_displayed() and b.is_enabled():
-                            self._safe_click(b)
-                            if self._wait_for_order_page():
-                                self.logger.info(f"已进入订单页（车次 {train_number}）")
-                                return True
-                    
-                    # 兜底方案
-                    try:
-                        td13 = row.find_element(By.XPATH, "./td[13]")
-                        links = td13.find_elements(By.TAG_NAME, "a")
-                        for lk in links:
-                            if lk.is_displayed() and lk.is_enabled():
-                                self._safe_click(lk)
+                        # 跳过无效行
+                        cls = row.get_attribute("class") or ""
+                        style = row.get_attribute("style") or ""
+                        if "btm" in cls or "display: none" in style:
+                            continue
+                        
+                        # 检查车次
+                        train_text = ""
+                        try:
+                            train_td = row.find_element(By.XPATH, "./td[1]")
+                            train_text = train_td.text.strip()
+                        except Exception:
+                            pass
+                        
+                        if not train_text or train_number not in train_text:
+                            continue
+                        
+                        # 找到目标车次
+                        train_found = True
+                        self.logger.info(f"找到目标车次 {train_number}，检查预订状态...")
+                        
+                        # 检查是否有可点击的预订按钮
+                        book_buttons = row.find_elements(By.XPATH, ".//a[contains(text(),'预订')]")
+                        for b in book_buttons:
+                            if b.is_displayed() and b.is_enabled():
+                                book_button_found = True
+                                self._safe_click(b)
                                 if self._wait_for_order_page():
-                                    self.logger.info(f"已进入订单页（车次 {train_number}，td13 兜底）")
+                                    self.logger.info(f"已进入订单页（车次 {train_number}）")
                                     return True
+                        
+                        # 兜底方案：检查第13列的链接
+                        try:
+                            td13 = row.find_element(By.XPATH, "./td[13]")
+                            links = td13.find_elements(By.TAG_NAME, "a")
+                            for lk in links:
+                                if lk.is_displayed() and lk.is_enabled():
+                                    book_button_found = True
+                                    self._safe_click(lk)
+                                    if self._wait_for_order_page():
+                                        self.logger.info(f"已进入订单页（车次 {train_number}，td13 兜底）")
+                                        return True
+                        except Exception:
+                            pass
                     except Exception:
-                        pass
-                except Exception:
-                    continue
-            raise Exception(f"未找到可预订的目标车次 {train_number}")
+                        continue
+                
+                # 分析查找结果
+                if not train_found:
+                    self.logger.warning(f"未找到目标车次 {train_number}，准备重新查询...")
+                elif not book_button_found:
+                    self.logger.warning(f"找到车次 {train_number} 但预订按钮不可点击，准备重新查询...")
+                
+                # 如果是最后一次尝试，仍然失败，则抛出异常
+                if retry == max_query_retries - 1:
+                    if not train_found:
+                        raise Exception(f"未找到目标车次 {train_number}")
+                    else:
+                        raise Exception(f"找到车次 {train_number} 但预订按钮不可点击")
+                
+                # 如果不是最后一次尝试，则重新查询
+                if retry < max_query_retries - 1:
+                    # 在点击查询按钮前先等待随机间隔
+                    random_interval = self._get_random_query_interval()
+                    self.logger.info(f"等待 {random_interval*1000:.0f}ms 后重新查询...")
+                    time.sleep(random_interval)
+                    
+                    self.logger.info(f"点击查询按钮重新获取车票信息...")
+                    self._click_query_button()
+                    
+            except Exception as e:
+                if "未找到目标车次" in str(e) or "预订按钮不可点击" in str(e):
+                    if retry < max_query_retries - 1:
+                        self.logger.warning(f"第{retry + 1}次尝试失败: {e}")
+                        continue
+                    else:
+                        self.logger.error(f"选择车次失败: {e}")
+                        self.error_message = str(e)
+                        self.status = BookingStatus.FAILED
+                        return False
+                else:
+                    self.logger.error(f"选择车次失败: {e}")
+                    self.error_message = str(e)
+                    self.status = BookingStatus.FAILED
+                    return False
+        
+        return False
+    
+    def _get_random_query_interval(self) -> float:
+        """生成随机的查询间隔时间（300-500ms）"""
+        import random
+        return random.uniform(0.3, 0.5)  # 300-500ms之间的随机数
+    
+    def _click_query_button(self) -> bool:
+        """点击查询按钮重新获取车票信息"""
+        try:
+            # 处理可能的遮罩层
+            self._handle_dhx_modal_cover()
+            
+            # 查找并点击查询按钮
+            query_button = self.driver.find_element(By.ID, "query_ticket")
+            if query_button.is_displayed() and query_button.is_enabled():
+                self._safe_click(query_button)
+                time.sleep(0.05)  # 50ms等待查询结果加载
+                self.logger.info("查询按钮点击成功")
+                return True
+            else:
+                self.logger.warning("查询按钮不可点击")
+                return False
         except Exception as e:
-            self.logger.error(f"选择车次失败: {e}")
-            self.error_message = str(e)
-            self.status = BookingStatus.FAILED
+            self.logger.error(f"点击查询按钮失败: {e}")
             return False
 
     def _wait_for_order_page(self) -> bool:

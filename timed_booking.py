@@ -225,7 +225,7 @@ class TimedBooking:
                 for task in self.tasks:
                     task_key = task.created_at.isoformat()
                     
-                    # 检查是否需要开始预搜索（提前1秒钟）
+                    # 检查是否需要开始预搜索（提前5分钟）
                     if (task.status == "pending" and 
                         not task.search_started and
                         current_time >= task.pre_search_start_time and
@@ -350,9 +350,18 @@ class TimedBooking:
             
             self.logger.info(f"当前时间: {current_time}, 预定时间: {target_time}")
             
-            # 如果当前时间早于预定时间，先进行一次预查询
-            if current_time < target_time:
-                self.logger.info("距离预定时间还有时间，先进行一次预查询...")
+            # 计算真正的预登录开始时间（预定时间前2分钟）
+            pre_login_time = target_time - timedelta(minutes=2)
+            
+            # 如果当前时间早于预登录时间，先等待
+            if current_time < pre_login_time:
+                wait_time = (pre_login_time - current_time).total_seconds()
+                self.logger.info(f"距离预登录时间还有 {wait_time:.1f} 秒，等待中...")
+                time.sleep(wait_time)
+            
+            # 预登录阶段（预定时间前2分钟开始）
+            if datetime.now() < target_time:
+                self.logger.info("开始预登录阶段...")
                 
                 # 打开浏览器并等待登录
                 login_success = self.auto_booking.open_browser_and_wait_for_login()
@@ -364,7 +373,14 @@ class TimedBooking:
                 
                 self.logger.info("浏览器已打开，用户已登录")
                 
-                # 填充搜索表单并查询一次
+                # 预定时间前1分钟填充搜索表单
+                pre_fill_time = target_time - timedelta(minutes=1)
+                if datetime.now() < pre_fill_time:
+                    wait_time = (pre_fill_time - datetime.now()).total_seconds()
+                    self.logger.info(f"等待 {wait_time:.1f} 秒到填充搜索表单时间...")
+                    time.sleep(wait_time)
+                
+                # 填充搜索表单
                 try:
                     self.auto_booking._fill_search_form(
                         task.ticket_info.train_info.departure_station,
@@ -372,30 +388,44 @@ class TimedBooking:
                         task.ticket_info.train_info.date
                     )
                     self.logger.info("搜索表单填充完成")
-                    
-                    if not self.auto_booking.search_tickets():
-                        self.logger.error("车票搜索失败")
-                        task.status = "failed"
-                        task.error_message = "搜索失败"
-                        return
-                    
-                    self.logger.info("预查询成功，等待到预定时间")
                 except Exception as e:
-                    self.logger.error(f"预查询过程异常: {e}")
+                    self.logger.error(f"填充搜索表单失败: {e}")
+                    task.status = "failed"
+                    task.error_message = f"填充表单异常: {str(e)}"
+                    return
+                
+                # 等待到预定时间前5秒进行查询
+                pre_query_time = target_time - timedelta(seconds=5)
+                if datetime.now() < pre_query_time:
+                    wait_time = (pre_query_time - datetime.now()).total_seconds()
+                    self.logger.info(f"等待 {wait_time:.1f} 秒到预查询时间...")
+                    time.sleep(wait_time)
+                
+                # 预定时间前5秒进行查询
+                try:
+                    self.logger.info("进行预查询...")
+                    if not self.auto_booking.search_tickets():
+                        self.logger.error("车票查询失败")
+                        task.status = "failed"
+                        task.error_message = "查询失败"
+                        return
+                    self.logger.info("预查询成功")
+                except Exception as e:
+                    self.logger.error(f"预查询失败: {e}")
                     task.status = "failed"
                     task.error_message = f"预查询异常: {str(e)}"
                     return
                 
-                # 等待到预定时间
-                wait_time = (target_time - datetime.now()).total_seconds()
-                if wait_time > 0:
-                    self.logger.info(f"等待 {wait_time:.1f} 秒到预定时间...")
-                    time.sleep(wait_time)
+                # 等待到精确的预定时间
+                final_wait_time = (target_time - datetime.now()).total_seconds()
+                if final_wait_time > 0:
+                    self.logger.info(f"最后等待 {final_wait_time:.1f} 秒到预定时间...")
+                    time.sleep(final_wait_time)
             
             # 到达预定时间，开始预订
             actual_start_time = datetime.now()
             time_offset = (actual_start_time - target_time).total_seconds()
-            self.logger.info(f"到达预定时间，开始预订: {task.ticket_info.train_info.train_number} (时间偏移: {time_offset:+.3f}秒)")
+            self.logger.info(f"🎯 到达预定时间，开始预订: {task.ticket_info.train_info.train_number} (时间偏移: {time_offset:+.3f}秒)")
             
             # 执行预订步骤
             self._execute_booking_steps(task, target_time)
@@ -434,8 +464,8 @@ class TimedBooking:
                     
                     # 选择车次
                     if not self.auto_booking.select_train(task.ticket_info.train_info.train_number):
-                        self.logger.warning("选择车次失败")
-                        time.sleep(0.01)
+                        self.logger.warning("选择车次失败，等待外部重试...")
+                        time.sleep(0.5)  # 外部重试间隔500ms
                         continue
                     
                     # 选择乘客和座位
